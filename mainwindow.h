@@ -51,6 +51,8 @@ private:
     QPushButton *convertAllButton;
     QTableWidget *filesTable;
 
+    QStringList completeFileList;
+
     QDir currentDir;
 };
 

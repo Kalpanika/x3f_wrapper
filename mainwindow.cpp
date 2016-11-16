@@ -39,6 +39,20 @@ MainWindow::~MainWindow()
 //    delete ui;
 }
 
+void convertX3FFile(const QUrl& fileName){
+#ifdef Q_OS_WIN32
+    QString executableName = "Windows";
+#elif Q_OS_MAC
+    QString executableName = "Mac";
+#elif Q_OS_LINUX
+    QString executableName = "Linux";
+#else
+    QString executableName = "Not Supported";
+#endif
+
+    QMessageBox::information(NULL, executableName, fileName.fileName());
+}
+
 void MainWindow::browse()
 {
     QString directory = QFileDialog::getExistingDirectory(this,
@@ -73,6 +87,7 @@ void MainWindow::find()
 
     files = findFiles(files);
     showFiles(files);
+    completeFileList = files;
     currentDir = QDir(path);
 }
 
@@ -151,10 +166,12 @@ void MainWindow::convertFile(int row, int /* column */)
 {
     QTableWidgetItem *item = filesTable->item(row, 0);
 
-    QDesktopServices::openUrl(QUrl::fromLocalFile(currentDir.absoluteFilePath(item->text())));
+    convertX3FFile(QUrl::fromLocalFile(currentDir.absoluteFilePath(item->text())));
 }
 
 void MainWindow::convertAllFiles()
 {
-
+    for (int i = 0; i < completeFileList.size(); ++i) {
+        convertX3FFile(QUrl::fromLocalFile(currentDir.absoluteFilePath(completeFileList[i])));
+    }
 }
