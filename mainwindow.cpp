@@ -41,7 +41,7 @@ MainWindow::~MainWindow()
 
 void convertX3FFile(const QUrl& fileName){
 #ifdef Q_OS_WIN32
-    QString executableName = "Windows";
+    QString executableName = "d:/src/x3f_wrapper/x3f_extract.exe";
 #elif Q_OS_MAC
     QString executableName = "Mac";
 #elif Q_OS_LINUX
@@ -50,7 +50,13 @@ void convertX3FFile(const QUrl& fileName){
     QString executableName = "Not Supported";
 #endif
 
-    QMessageBox::information(NULL, executableName, fileName.fileName());
+    QStringList arguments;
+    arguments << "-color";
+    arguments << "ProPhotoRGB";
+    arguments << fileName.toLocalFile();
+    int exitCode = QProcess::execute(executableName, arguments);
+    QMessageBox::information(NULL, "Finished Processing " + fileName.fileName(),
+                             QString::number(exitCode));
 }
 
 void MainWindow::browse()
