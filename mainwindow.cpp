@@ -1,4 +1,5 @@
 #include <QtWidgets>
+#include <QFileInfo>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -39,7 +40,14 @@ MainWindow::~MainWindow()
 //    delete ui;
 }
 
-void convertX3FFile(const QUrl& fileName){
+void MainWindow::changeUI(const bool& ui_toggle){
+    browseButton->setEnabled(ui_toggle);
+    convertAllButton->setEnabled(ui_toggle);
+    filesTable->setEnabled(ui_toggle);
+    directoryComboBox->setEnabled(ui_toggle);
+}
+
+void MainWindow::convertX3FFile(const QUrl& fileName){
 #ifdef Q_OS_WIN32
     QString executableName = "d:/src/x3f_wrapper/x3f_extract.exe";
 #elif Q_OS_MAC
@@ -54,9 +62,10 @@ void convertX3FFile(const QUrl& fileName){
     arguments << "-color";
     arguments << "ProPhotoRGB";
     arguments << fileName.toLocalFile();
+    changeUI(false);
     int exitCode = QProcess::execute(executableName, arguments);
-    QMessageBox::information(NULL, "Finished Processing " + fileName.fileName(),
-                             QString::number(exitCode));
+    changeUI(true);
+    showFiles(completeFileList);
 }
 
 void MainWindow::browse()
@@ -120,14 +129,28 @@ QStringList MainWindow::findFiles(const QStringList &files)
     return foundFiles;
 }
 
+bool fileExists(const QString &path) {
+    QFileInfo check_file(path);
+    // check if file exists and if yes: Is it really a file and no directory?
+    return check_file.exists() && check_file.isFile();
+}
+
 void MainWindow::showFiles(const QStringList &files)
 {
+    filesTable->setRowCount(0);
     for (int i = 0; i < files.size(); ++i) {
         QFile file(currentDir.absoluteFilePath(files[i]));
         qint64 size = QFileInfo(file).size();
+        QString hasExtractedFile = "Processed!";
+        if (!fileExists(currentDir.absoluteFilePath(files[i]) + ".dng")){
+            hasExtractedFile = "Not yet";
+        }
 
         QTableWidgetItem *fileNameItem = new QTableWidgetItem(files[i]);
         fileNameItem->setFlags(fileNameItem->flags() ^ Qt::ItemIsEditable);
+        QTableWidgetItem *dngItem = new QTableWidgetItem(hasExtractedFile);
+        dngItem->setFlags(dngItem->flags() ^ Qt::ItemIsEditable);
+
         QTableWidgetItem *sizeItem = new QTableWidgetItem(tr("%1 KB")
                                              .arg(int((size + 1023) / 1024)));
         sizeItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -136,7 +159,8 @@ void MainWindow::showFiles(const QStringList &files)
         int row = filesTable->rowCount();
         filesTable->insertRow(row);
         filesTable->setItem(row, 0, fileNameItem);
-        filesTable->setItem(row, 1, sizeItem);
+        filesTable->setItem(row, 1, dngItem);
+        filesTable->setItem(row, 2, sizeItem);
     }
     filesConvertLabel->setText(tr("%1 file(s) found").arg(files.size()) +
                              (" (Double click on a file to convert it)"));
@@ -154,11 +178,11 @@ QComboBox *MainWindow::createComboBox(const QString &text)
 
 void MainWindow::createFilesTable()
 {
-    filesTable = new QTableWidget(0, 2);
+    filesTable = new QTableWidget(0, 3);
     filesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     QStringList labels;
-    labels << tr("Filename") << tr("Size");
+    labels << tr("Filename") << tr("Processed?") <<  tr("Size");
     filesTable->setHorizontalHeaderLabels(labels);
     filesTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
     filesTable->verticalHeader()->hide();

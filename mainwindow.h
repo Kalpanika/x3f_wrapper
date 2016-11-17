@@ -43,6 +43,8 @@ private:
     void showFiles(const QStringList &files);
     QComboBox *createComboBox(const QString &text = QString());
     void createFilesTable();
+    void convertX3FFile(const QUrl& fileName);
+    void changeUI(const bool& ui_toggle);
 
     QComboBox *directoryComboBox;
     QLabel *directoryLabel;
