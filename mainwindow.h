@@ -45,12 +45,14 @@ private:
     void createFilesTable();
     void convertX3FFile(const QUrl& fileName);
     void changeUI(const bool& ui_toggle);
+    void configureSettings();
 
     QComboBox *directoryComboBox;
     QLabel *directoryLabel;
     QLabel *filesConvertLabel;
     QPushButton *browseButton;
     QPushButton *convertAllButton;
+    QPushButton *configureButton;
     QTableWidget *filesTable;
 
     QStringList completeFileList;

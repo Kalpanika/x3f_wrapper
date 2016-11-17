@@ -11,7 +11,12 @@ MainWindow::MainWindow(QWidget *parent) :
     browseButton = new QPushButton(tr("&Browse..."), this);
     connect(browseButton, &QAbstractButton::clicked, this, &MainWindow::browse);
     convertAllButton = new QPushButton(tr("&Convert all"), this);
-    connect(convertAllButton, &QAbstractButton::clicked, this, &MainWindow::convertAllFiles);
+    connect(convertAllButton, &QAbstractButton::clicked,
+            this, &MainWindow::convertAllFiles);
+
+    configureButton = new QPushButton(tr("Con&figure Settings"), this);
+    connect(configureButton, &QAbstractButton::clicked,
+            this, &MainWindow::configureSettings);
 
     directoryComboBox = createComboBox(QDir::currentPath());
 
@@ -25,8 +30,9 @@ MainWindow::MainWindow(QWidget *parent) :
     mainLayout->addWidget(directoryComboBox, 2, 1);
     mainLayout->addWidget(browseButton, 2, 2);
     mainLayout->addWidget(filesTable, 3, 0, 1, 3);
-    mainLayout->addWidget(filesConvertLabel, 4, 0, 1, 2);
+    mainLayout->addWidget(filesConvertLabel, 4, 1, 1, 2);
     mainLayout->addWidget(convertAllButton, 4, 2);
+    mainLayout->addWidget(configureButton, 4, 0);
     setLayout(mainLayout);
 
     setWindowTitle(tr("Convert X3F Files"));
@@ -45,6 +51,7 @@ void MainWindow::changeUI(const bool& ui_toggle){
     convertAllButton->setEnabled(ui_toggle);
     filesTable->setEnabled(ui_toggle);
     directoryComboBox->setEnabled(ui_toggle);
+    configureButton->setEnabled(ui_toggle);
 }
 
 void MainWindow::convertX3FFile(const QUrl& fileName){
@@ -64,6 +71,10 @@ void MainWindow::convertX3FFile(const QUrl& fileName){
     arguments << fileName.toLocalFile();
     changeUI(false);
     int exitCode = QProcess::execute(executableName, arguments);
+    if (exitCode != 0){
+        QMessageBox::critical(NULL, "Something went wrong.",
+                              "Something happened while processing the image.  Error code:" + QString::number(exitCode));
+    }
     changeUI(true);
     showFiles(completeFileList);
 }
@@ -80,6 +91,10 @@ void MainWindow::browse()
     }
 
     find();
+}
+
+void MainWindow::configureSettings(){
+
 }
 
 static void updateComboBox(QComboBox *comboBox)
