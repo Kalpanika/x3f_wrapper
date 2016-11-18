@@ -3,6 +3,7 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "cpreferencespane.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent)
@@ -37,6 +38,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setWindowTitle(tr("Convert X3F Files"));
     resize(700, 300);
+
+    mPreferencesPane = new CPreferencesPane();
 
     currentDir = QDir::currentPath(); //should use a registry entry or some such
 }
@@ -94,7 +97,9 @@ void MainWindow::browse()
 }
 
 void MainWindow::configureSettings(){
-
+    changeUI(false);
+    mPreferencesPane->exec();
+    changeUI(true);
 }
 
 static void updateComboBox(QComboBox *comboBox)

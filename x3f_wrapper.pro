@@ -12,6 +12,8 @@ TARGET = x3f_wrapper
 TEMPLATE = app
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    cpreferencespane.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    cpreferencespane.h

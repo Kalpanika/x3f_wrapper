@@ -12,6 +12,7 @@ class QPushButton;
 class QTableWidget;
 class QTableWidgetItem;
 QT_END_NAMESPACE
+class CPreferencesPane;
 
 /*
  * This basic class borrows heavily from the findfiles example.
@@ -56,6 +57,8 @@ private:
     QTableWidget *filesTable;
 
     QStringList completeFileList;
+
+    CPreferencesPane *mPreferencesPane;
 
     QDir currentDir;
 };
