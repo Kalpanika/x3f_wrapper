@@ -13,7 +13,9 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    cpreferencespane.cpp
+    cpreferencespane.cpp \
+    stringconstants.cpp
 
 HEADERS  += mainwindow.h \
-    cpreferencespane.h
+    cpreferencespane.h \
+    stringconstants.h

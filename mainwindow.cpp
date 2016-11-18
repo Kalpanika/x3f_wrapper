@@ -4,6 +4,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "cpreferencespane.h"
+#include "stringconstants.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent)
@@ -19,7 +20,16 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(configureButton, &QAbstractButton::clicked,
             this, &MainWindow::configureSettings);
 
-    directoryComboBox = createComboBox(QDir::currentPath());
+    //get settings here to get the page
+    settings = new QSettings;
+    int dirLen = settings->value(StringConstants::lastDir).toString().length();
+    if (dirLen){
+        currentDir = QDir(settings->value(StringConstants::lastDir).toString());
+    } else {
+        currentDir = QDir::currentPath();
+    }
+
+    directoryComboBox = createComboBox(currentDir.absolutePath());
 
     directoryLabel = new QLabel(tr("In directory:"));
     filesConvertLabel = new QLabel;
@@ -40,8 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
     resize(700, 300);
 
     mPreferencesPane = new CPreferencesPane();
-
-    currentDir = QDir::currentPath(); //should use a registry entry or some such
+    find();
 }
 
 MainWindow::~MainWindow()
@@ -93,6 +102,9 @@ void MainWindow::browse()
         directoryComboBox->setCurrentIndex(directoryComboBox->findText(directory));
     }
 
+    currentDir = QDir(directory);
+    settings->setValue(StringConstants::lastDir, directory);
+    settings->sync();
     find();
 }
 
@@ -123,7 +135,6 @@ void MainWindow::find()
     files = findFiles(files);
     showFiles(files);
     completeFileList = files;
-    currentDir = QDir(path);
 }
 
 QStringList MainWindow::findFiles(const QStringList &files)

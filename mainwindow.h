@@ -11,6 +11,7 @@ class QLabel;
 class QPushButton;
 class QTableWidget;
 class QTableWidgetItem;
+class QSettings;
 QT_END_NAMESPACE
 class CPreferencesPane;
 
@@ -61,6 +62,7 @@ private:
     CPreferencesPane *mPreferencesPane;
 
     QDir currentDir;
+    QSettings *settings;
 };
 
 #endif // MAINWINDOW_H
