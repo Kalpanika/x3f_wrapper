@@ -6,7 +6,7 @@
 #include <QDir>
 
 QT_BEGIN_NAMESPACE
-class QComboBox;
+class QLineEdit;
 class QLabel;
 class QPushButton;
 class QTableWidget;
@@ -43,13 +43,12 @@ private:
 
     QStringList findFiles(const QStringList &files);
     void showFiles(const QStringList &files);
-    QComboBox *createComboBox(const QString &text = QString());
     void createFilesTable();
     void convertX3FFile(const QUrl& fileName);
     void changeUI(const bool& ui_toggle);
     void configureSettings();
 
-    QComboBox *directoryComboBox;
+    QLineEdit *directoryLineEdit;
     QLabel *directoryLabel;
     QLabel *filesConvertLabel;
     QPushButton *browseButton;
@@ -61,7 +60,7 @@ private:
 
     CPreferencesPane *mPreferencesPane;
 
-    QDir currentDir;
+    QString currentDir;
     QSettings *settings;
 };
 

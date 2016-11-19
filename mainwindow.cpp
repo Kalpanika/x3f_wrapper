@@ -24,12 +24,13 @@ MainWindow::MainWindow(QWidget *parent) :
     settings = new QSettings;
     int dirLen = settings->value(StringConstants::lastDir).toString().length();
     if (dirLen){
-        currentDir = QDir(settings->value(StringConstants::lastDir).toString());
+        currentDir = settings->value(StringConstants::lastDir).toString();
     } else {
         currentDir = QDir::currentPath();
     }
 
-    directoryComboBox = createComboBox(currentDir.absolutePath());
+    directoryLineEdit = new QLineEdit;
+    directoryLineEdit->setText(currentDir);
 
     directoryLabel = new QLabel(tr("In directory:"));
     filesConvertLabel = new QLabel;
@@ -38,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->addWidget(directoryLabel, 2, 0);
-    mainLayout->addWidget(directoryComboBox, 2, 1);
+    mainLayout->addWidget(directoryLineEdit, 2, 1);
     mainLayout->addWidget(browseButton, 2, 2);
     mainLayout->addWidget(filesTable, 3, 0, 1, 3);
     mainLayout->addWidget(filesConvertLabel, 4, 1, 1, 2);
@@ -62,7 +63,7 @@ void MainWindow::changeUI(const bool& ui_toggle){
     browseButton->setEnabled(ui_toggle);
     convertAllButton->setEnabled(ui_toggle);
     filesTable->setEnabled(ui_toggle);
-    directoryComboBox->setEnabled(ui_toggle);
+    directoryLineEdit->setEnabled(ui_toggle);
     configureButton->setEnabled(ui_toggle);
 }
 
@@ -94,15 +95,12 @@ void MainWindow::convertX3FFile(const QUrl& fileName){
 void MainWindow::browse()
 {
     QString directory = QFileDialog::getExistingDirectory(this,
-                               tr("Find X3F Files"), currentDir.absolutePath());
+                                                          tr("Find X3F Files"),
+                                                          currentDir);
 
-    if (!directory.isEmpty()) {
-        if (directoryComboBox->findText(directory) == -1)
-            directoryComboBox->addItem(directory);
-        directoryComboBox->setCurrentIndex(directoryComboBox->findText(directory));
-    }
+    directoryLineEdit->setText(directory);
 
-    currentDir = QDir(directory);
+    currentDir = directory;
     settings->setValue(StringConstants::lastDir, directory);
     settings->sync();
     find();
@@ -123,13 +121,12 @@ static void updateComboBox(QComboBox *comboBox)
 void MainWindow::find()
 {
     filesTable->setRowCount(0);
-    QString path = directoryComboBox->currentText();
-    updateComboBox(directoryComboBox);
+    QString path = directoryLineEdit->text();
 
-    currentDir = QDir(path);
+    currentDir = path;
     QStringList files;
     QString fileName = "*.x3f";
-    files = currentDir.entryList(QStringList(fileName),
+    files = QDir(currentDir).entryList(QStringList(fileName),
                                  QDir::Files | QDir::NoSymLinks);
 
     files = findFiles(files);
@@ -169,11 +166,12 @@ bool fileExists(const QString &path) {
 void MainWindow::showFiles(const QStringList &files)
 {
     filesTable->setRowCount(0);
+    QDir actualDirectory = QDir(currentDir);
     for (int i = 0; i < files.size(); ++i) {
-        QFile file(currentDir.absoluteFilePath(files[i]));
+        QFile file(actualDirectory.absoluteFilePath(files[i]));
         qint64 size = QFileInfo(file).size();
         QString hasExtractedFile = "Processed!";
-        if (!fileExists(currentDir.absoluteFilePath(files[i]) + ".dng")){
+        if (!fileExists(actualDirectory.absoluteFilePath(files[i]) + ".dng")){
             hasExtractedFile = "Not yet";
         }
 
@@ -198,15 +196,6 @@ void MainWindow::showFiles(const QStringList &files)
     filesConvertLabel->setWordWrap(true);
 }
 
-QComboBox *MainWindow::createComboBox(const QString &text)
-{
-    QComboBox *comboBox = new QComboBox;
-    comboBox->setEditable(true);
-    comboBox->addItem(text);
-    comboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    return comboBox;
-}
-
 void MainWindow::createFilesTable()
 {
     filesTable = new QTableWidget(0, 3);
@@ -227,12 +216,14 @@ void MainWindow::convertFile(int row, int /* column */)
 {
     QTableWidgetItem *item = filesTable->item(row, 0);
 
-    convertX3FFile(QUrl::fromLocalFile(currentDir.absoluteFilePath(item->text())));
+    QDir actualDirectory = QDir(currentDir);
+    convertX3FFile(QUrl::fromLocalFile(actualDirectory.absoluteFilePath(item->text())));
 }
 
 void MainWindow::convertAllFiles()
 {
+    QDir actualDirectory = QDir(currentDir);
     for (int i = 0; i < completeFileList.size(); ++i) {
-        convertX3FFile(QUrl::fromLocalFile(currentDir.absoluteFilePath(completeFileList[i])));
+        convertX3FFile(QUrl::fromLocalFile(actualDirectory.absoluteFilePath(completeFileList[i])));
     }
 }
