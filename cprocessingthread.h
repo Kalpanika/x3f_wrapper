@@ -2,6 +2,9 @@
 #define CPROCESSINGTHREAD_H
 
 #include <QThread>
+#include <QStringList>
+#include <QDir>
+#include <QUrl>
 
 QT_BEGIN_NAMESPACE
 class QSettings;
@@ -30,9 +33,12 @@ signals:
     void finished();
 
 private:
-    QSettings settings;
+    QSettings *settings;
     QStringList files;
     QDir currentDir;
+
+    QStringList buildArgList();
+    void convertX3FFile(const QUrl& fileName, const QStringList& inArgs);
 };
 
 #endif // CPROCESSINGTHREAD_H

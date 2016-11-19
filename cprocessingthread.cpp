@@ -1,5 +1,8 @@
 #include "cprocessingthread.h"
-#include "QSettings"
+#include <QSettings>
+#include "stringconstants.h"
+#include <QProcess>
+
 
 // see https://forum.qt.io/topic/60265/separate-qthread-to-update-qdialog-s-ui/3
 
@@ -70,7 +73,7 @@ void CProcessingThread::convertX3FFile(const QUrl& fileName, const QStringList& 
     if (exitCode != 0){
         emit error_message("Something went wrong.",
                            "Something happened while processing the image.  Error code: " + QString::number(exitCode) +
-                           " argument list: " + arguments);
+                           " argument list: [" + arguments.join(", ") + "]");
 
         return;
     }
@@ -95,7 +98,6 @@ void CProcessingThread::convertX3FFile(const QUrl& fileName, const QStringList& 
         exitCode = QProcess::execute(exiftools, exiftoolsargs);
     }
     //qDebug() << exiftoolsargs;
-    showFiles(completeFileList);
 }
 
 void CProcessingThread::run()
