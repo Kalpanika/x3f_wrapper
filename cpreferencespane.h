@@ -9,6 +9,7 @@ class QLabel;
 class QPushButton;
 class QCheckBox;
 class QLineEdit;
+class QSettings;
 QT_END_NAMESPACE
 
 class CPreferencesPane : public QDialog
@@ -46,6 +47,8 @@ private:
     QLineEdit *exiftoolsLocation;
     QPushButton *browseX3FButton;
     QPushButton *browseEXIFButton;
+
+    QSettings *settings;
 };
 
 #endif // CPREFERENCESPANE_H

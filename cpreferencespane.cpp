@@ -1,5 +1,6 @@
 #include <QtWidgets>
 #include "cpreferencespane.h"
+#include "stringconstants.h"
 
 CPreferencesPane::CPreferencesPane(QDialog *parent) : QDialog(parent)
 {
@@ -56,6 +57,7 @@ CPreferencesPane::CPreferencesPane(QDialog *parent) : QDialog(parent)
     connect(browseEXIFButton, &QAbstractButton::clicked,
             this, &CPreferencesPane::browseEXIF);
 
+    settings = new QSettings();
     loadPreferences();
 
     QGridLayout *preferencesLayout = new QGridLayout;
@@ -89,15 +91,38 @@ CPreferencesPane::~CPreferencesPane(){
 }
 
 void CPreferencesPane::loadPreferences(){
-
+    denoise->setChecked(settings->value(StringConstants::denoise).toBool());
+    compress->setChecked(settings->value(StringConstants::compress).toBool());
+    ocl->setChecked(settings->value(StringConstants::ocl).toBool());
+    formatComboBox->setCurrentIndex(settings->value(StringConstants::outputFormat).toInt());
+    colorComboBox->setCurrentIndex(settings->value(StringConstants::outputColor).toInt());
+    whiteBalanceComboBox->setCurrentIndex(settings->value(StringConstants::outputWB).toInt());
+    extractLocation->setText(settings->value(StringConstants::x3fLocation).toString());
+    exiftoolsLocation->setText(settings->value(StringConstants::exifToolsLocation).toString());
 }
 
 void CPreferencesPane::savePreferences(){
-
+    settings->setValue(StringConstants::denoise, denoise->isChecked());
+    settings->setValue(StringConstants::compress, compress->isChecked());
+    settings->setValue(StringConstants::ocl, ocl->isChecked());
+    settings->setValue(StringConstants::outputFormat, formatComboBox->currentIndex());
+    settings->setValue(StringConstants::outputColor, colorComboBox->currentIndex());
+    settings->setValue(StringConstants::outputWB, whiteBalanceComboBox->currentIndex());
+    settings->setValue(StringConstants::x3fLocation, extractLocation->text());
+    settings->setValue(StringConstants::exifToolsLocation, exiftoolsLocation->text());
+    settings->sync();
 }
 
 void CPreferencesPane::resetPreferences(){
-
+    denoise->setChecked(true);
+    compress->setChecked(true);
+    ocl->setChecked(false);
+    formatComboBox->setCurrentIndex(0);
+    colorComboBox->setCurrentIndex(0);
+    whiteBalanceComboBox->setCurrentIndex(0);
+    extractLocation->setText("");
+    exiftoolsLocation->setText("");
+    savePreferences();
 }
 
 void CPreferencesPane::browseX3F(){
@@ -105,7 +130,8 @@ void CPreferencesPane::browseX3F(){
     QString directory = QFileDialog::getOpenFileName(this,
                                                      tr("Find X3F Extract Program"),
                                                      currentDir.absolutePath());
-
+    extractLocation->setText(directory);
+    savePreferences();
 }
 
 void CPreferencesPane::browseEXIF(){
@@ -113,6 +139,6 @@ void CPreferencesPane::browseEXIF(){
     QString directory = QFileDialog::getOpenFileName(this,
                                                      tr("Find EXIF Tools Program"),
                                                      currentDir.absolutePath());
-
-
+    exiftoolsLocation->setText(directory);
+    savePreferences();
 }
