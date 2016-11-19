@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
         settings.setValue(StringConstants::outputFormat, 0);
         settings.setValue(StringConstants::outputColor, 0);
         settings.setValue(StringConstants::outputWB, 0);
-        settings.setValue(StringConstants::x3fLocation, QDir::currentPath());
-        settings.setValue(StringConstants::exifToolsLocation, QDir::currentPath());
+        settings.setValue(StringConstants::x3fLocation, "");
+        settings.setValue(StringConstants::exifToolsLocation, "");
         settings.sync();
     }
 

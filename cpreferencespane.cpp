@@ -18,7 +18,7 @@ CPreferencesPane::CPreferencesPane(QDialog *parent) : QDialog(parent)
     colorComboBox = new QComboBox;
     colorLabel = new QLabel("Color Mode:");
     for (i = 0; i < StringConstants::colorOptions.size(); i++){
-        formatComboBox->addItem(StringConstants::colorOptions[i]);
+        colorComboBox->addItem(StringConstants::colorOptions[i]);
     };
     colorComboBox->setEditable(false);
 
@@ -30,7 +30,7 @@ CPreferencesPane::CPreferencesPane(QDialog *parent) : QDialog(parent)
 
     whiteBalanceComboBox = new QComboBox;
     for (i = 0; i < StringConstants::wbOptions.size(); i++){
-        formatComboBox->addItem(StringConstants::wbOptions[i]);
+        whiteBalanceComboBox->addItem(StringConstants::wbOptions[i]);
     };
     whiteBalanceLabel = new QLabel("White Balance:");
 

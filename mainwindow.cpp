@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     browseButton = new QPushButton(tr("&Browse..."), this);
     connect(browseButton, &QAbstractButton::clicked, this, &MainWindow::browse);
+
     convertAllButton = new QPushButton(tr("&Convert unprocessed"), this);
     connect(convertAllButton, &QAbstractButton::clicked,
             this, &MainWindow::convertAllFiles);
@@ -68,8 +69,6 @@ void MainWindow::changeUI(const bool& ui_toggle){
 }
 
 void MainWindow::convertX3FFile(const QUrl& fileName, const QStringList& inArgs){
-
-
     if (QFile::exists(fileName.toLocalFile() + ".dng")){
         return;
     }
@@ -224,6 +223,17 @@ void MainWindow::createFilesTable()
 
 void MainWindow::convertFile(int row, int /* column */)
 {
+    if (settings->value(StringConstants::x3fLocation).toString().length() < 1){
+        QMessageBox::critical(NULL, "Please set the location of the x3f extractor executable",
+                              "This program needs the x3f_extract program to be installed.");
+        return;
+    }
+    if (settings->value(StringConstants::exifToolsLocation).toString().length() < 1){
+        QMessageBox::critical(NULL, "Please set the location of the exiftools executable",
+                              "This program needs the exif tools program to be installed.");
+        return;
+    }
+
     filesConvertLabel->setText("Processing a single image.");
     QTableWidgetItem *item = filesTable->item(row, 0);
 
