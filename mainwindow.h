@@ -41,10 +41,10 @@ private slots:
 
 private:
 
-    QStringList findFiles(const QStringList &files);
     void showFiles(const QStringList &files);
     void createFilesTable();
-    void convertX3FFile(const QUrl& fileName);
+    void convertX3FFile(const QUrl& fileName, const QStringList& inArgs);
+    QStringList buildArgList();
     void changeUI(const bool& ui_toggle);
     void configureSettings();
 

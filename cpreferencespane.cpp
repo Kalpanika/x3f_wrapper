@@ -5,9 +5,10 @@
 CPreferencesPane::CPreferencesPane(QDialog *parent) : QDialog(parent)
 {
     formatComboBox = new QComboBox;
-    formatComboBox->addItem("DNG (default)");
-    formatComboBox->addItem("Embedded JPG");
-    formatComboBox->addItem("TIFF");
+    int i;
+    for (i = 0; i < StringConstants::formatOptions.size(); i++){
+        formatComboBox->addItem(StringConstants::formatOptions[i]);
+    }
     formatComboBox->setEditable(false);
     formatLabel = new QLabel("Output Format:");
 
@@ -16,29 +17,21 @@ CPreferencesPane::CPreferencesPane(QDialog *parent) : QDialog(parent)
 
     colorComboBox = new QComboBox;
     colorLabel = new QLabel("Color Mode:");
-    colorComboBox->addItem("sRBG (default)");
-    colorComboBox->addItem("AdobeRGB");
-    colorComboBox->addItem("ProPhotoRGB");
+    for (i = 0; i < StringConstants::colorOptions.size(); i++){
+        formatComboBox->addItem(StringConstants::colorOptions[i]);
+    };
     colorComboBox->setEditable(false);
 
     denoise = new QCheckBox("Denoise?  (usually yes)");
 
-    compress = new QCheckBox("Compress output? (usually yes)");
+    compress = new QCheckBox("Compress output? (usually yes, only used on DNG and TIFF output)");
 
-    ocl = new QCheckBox("Use OpenCL? (usually yes)");
+    ocl = new QCheckBox("Use OpenCL? (faster, less stable; use at your own risk)");
 
     whiteBalanceComboBox = new QComboBox;
-    whiteBalanceComboBox->addItem("As Taken (Default)");
-    whiteBalanceComboBox->addItem("Auto)");
-    whiteBalanceComboBox->addItem("Sunlight");
-    whiteBalanceComboBox->addItem("Shadow");
-    whiteBalanceComboBox->addItem("Overcast");
-    whiteBalanceComboBox->addItem("Incandescent");
-    whiteBalanceComboBox->addItem("Florescent");
-    whiteBalanceComboBox->addItem("Flash");
-    whiteBalanceComboBox->addItem("Custom");
-    whiteBalanceComboBox->addItem("Color Temp");
-    whiteBalanceComboBox->addItem("Auto LSP");
+    for (i = 0; i < StringConstants::wbOptions.size(); i++){
+        formatComboBox->addItem(StringConstants::wbOptions[i]);
+    };
     whiteBalanceLabel = new QLabel("White Balance:");
 
     saveButton = new QPushButton(tr("&Save"), this);
@@ -64,9 +57,9 @@ CPreferencesPane::CPreferencesPane(QDialog *parent) : QDialog(parent)
     int row = 0;
     preferencesLayout->addWidget(formatLabel, row, 0);
     preferencesLayout->addWidget(formatComboBox, row++, 1);
-    preferencesLayout->addWidget(denoise, row++, 0);
-    preferencesLayout->addWidget(compress, row++, 0);
-    preferencesLayout->addWidget(ocl, row++, 0);
+    preferencesLayout->addWidget(denoise, row++, 0, 1, 2);
+    preferencesLayout->addWidget(compress, row++, 0, 1, 2);
+    preferencesLayout->addWidget(ocl, row++, 0, 1, 2);
     preferencesLayout->addWidget(colorLabel, row, 0);
     preferencesLayout->addWidget(colorComboBox, row++, 1);
     preferencesLayout->addWidget(whiteBalanceLabel, row, 0);
@@ -116,7 +109,7 @@ void CPreferencesPane::savePreferences(){
 void CPreferencesPane::resetPreferences(){
     denoise->setChecked(true);
     compress->setChecked(true);
-    ocl->setChecked(false);
+    ocl->setChecked(true);
     formatComboBox->setCurrentIndex(0);
     colorComboBox->setCurrentIndex(0);
     whiteBalanceComboBox->setCurrentIndex(0);
