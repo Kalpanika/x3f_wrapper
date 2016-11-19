@@ -30,7 +30,7 @@ protected:
 signals:
     void progress(int currIndex, int totalNumber);
     void error_message(QString errorTitle, QString errorBody);
-    void finished();
+    void finishedProcessing();
 
 private:
     QSettings *settings;

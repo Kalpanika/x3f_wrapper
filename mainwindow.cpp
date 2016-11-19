@@ -2,7 +2,6 @@
 #include <QFileInfo>
 
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 #include "cpreferencespane.h"
 #include "stringconstants.h"
 #include "cprocessingthread.h"
@@ -189,7 +188,16 @@ void MainWindow::convertFile(int row, int /* column */)
 }
 
 void MainWindow::updateProgress(int currIndex, int totalNumber){
-    filesConvertLabel->setText(tr("%1 file(s) converted of %2").arg(currIndex, totalNumber));
+    //this signal is received, but finishedProcessing is not...
+    filesConvertLabel->setText(QString::number(currIndex + 1) +
+                               " file(s) converted of " +
+                               QString::number(totalNumber));
+    if (currIndex + 1 == totalNumber){
+        filesConvertLabel->setText(QString::number(currIndex + 1) + tr(" file(s) processed") +
+                                 (" (Double click on a file to convert it)"));
+        changeUI(true);
+    }
+    find();
 }
 
 void MainWindow::finishedProcessing(){
@@ -210,13 +218,13 @@ void MainWindow::convertAllFiles()
     }
 
     changeUI(false);
-    filesConvertLabel->setText("Starting Processing");
+    filesConvertLabel->setText("Processing...");
     QDir actualDirectory = QDir(currentDir);
     mProcessingThread = new CProcessingThread(completeFileList, actualDirectory);
 
-    connect (mProcessingThread, SIGNAL(progress(int, int)), this, SLOT(updateProgress));
-    connect (mProcessingThread, SIGNAL(error_message(QString, QString)), this, SLOT(error_message));
-    connect (mProcessingThread, SIGNAL(finished), this, SLOT(finishedProcessing));
+    connect (mProcessingThread, SIGNAL(progress(int, int)), this, SLOT(updateProgress(int, int)));
+    connect (mProcessingThread, SIGNAL(error_message(QString, QString)), this, SLOT(error_message(QString, QString)));
+    connect (mProcessingThread, SIGNAL(finishedProcessing), this, SLOT(finishedProcessing));
 
     mProcessingThread->start();
 }

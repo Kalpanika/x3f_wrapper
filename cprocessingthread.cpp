@@ -81,7 +81,8 @@ void CProcessingThread::convertX3FFile(const QUrl& fileName, const QStringList& 
     QString exiftools = settings->value(StringConstants::exifToolsLocation).toString();
     QStringList exiftoolsargs;
     exiftoolsargs << exiftools;
-    exiftoolsargs << "-TagsFromFile";
+    exiftoolsargs << "-overwrite_original";
+    exiftoolsargs << "-tagsFromFile";
     exiftoolsargs << fileName.toLocalFile();
     exiftoolsargs << "-all:all";
     int format = settings->value(StringConstants::outputFormat).toInt();
@@ -97,7 +98,6 @@ void CProcessingThread::convertX3FFile(const QUrl& fileName, const QStringList& 
         exiftoolsargs << fileName.toLocalFile() + ".dng";
         exitCode = QProcess::execute(exiftools, exiftoolsargs);
     }
-    //qDebug() << exiftoolsargs;
 }
 
 void CProcessingThread::run()
@@ -108,5 +108,6 @@ void CProcessingThread::run()
                        arguments);
         emit progress(i, files.size());
     }
-
+    emit finishedProcessing();
+    sleep(1);  //to make sure the final signal is emitted before the thread is killed
 }
