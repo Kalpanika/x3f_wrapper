@@ -50,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setLayout(mainLayout);
 
     setWindowTitle(tr("Convert X3F Files"));
-    resize(700, 300);
+    resize(700, 350);
 
     mPreferencesPane = new CPreferencesPane();
     find();
@@ -222,19 +222,26 @@ void MainWindow::createFilesTable()
             this, &MainWindow::convertFile);
 }\
 
-void MainWindow::convertFile(int row, int /* column */)
-{
+bool MainWindow::checkSettings(){
+    // use this function to check to see if the settings are properly configured
     if (settings->value(StringConstants::x3fLocation).toString().length() < 1){
         QMessageBox::critical(NULL, "Please set the location of the x3f extractor executable",
-                              "This program needs the x3f_extract program to be installed.");
-        return;
+                              "This program needs the x3f_extract program to be installed.  You can get it here: <a href=\"https://github.com/Kalpanika/x3f/releases\">https://github.com/Kalpanika/x3f/releases</a>");
+        return false;
     }
     if (settings->value(StringConstants::exifToolsLocation).toString().length() < 1){
         QMessageBox::critical(NULL, "Please set the location of the exiftools executable",
-                              "This program needs the exif tools program to be installed.");
+                              "This program needs the exif tools program to be installed.  You can get it here: <a href=\"http://www.sno.phy.queensu.ca/~phil/exiftool/\">http://www.sno.phy.queensu.ca/~phil/exiftool/</a>");
+        return false;
+    }
+    return true;
+}
+
+void MainWindow::convertFile(int row, int /* column */)
+{
+    if (!checkSettings()){
         return;
     }
-
     changeUI(false);
     filesConvertLabel->setText("Processing a single image.");
     QTableWidgetItem *item = filesTable->item(row, 0);
@@ -251,14 +258,7 @@ void MainWindow::convertFile(int row, int /* column */)
 
 void MainWindow::convertAllFiles()
 {
-    if (settings->value(StringConstants::x3fLocation).toString().length() < 1){
-        QMessageBox::critical(NULL, "Please set the location of the x3f extractor executable",
-                              "This program needs the x3f_extract program to be installed.");
-        return;
-    }
-    if (settings->value(StringConstants::exifToolsLocation).toString().length() < 1){
-        QMessageBox::critical(NULL, "Please set the location of the exiftools executable",
-                              "This program needs the exif tools program to be installed.");
+    if (!checkSettings()){
         return;
     }
 
