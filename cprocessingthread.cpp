@@ -52,7 +52,19 @@ QStringList CProcessingThread::buildArgList(){
 
 
 void CProcessingThread::convertX3FFile(const QUrl& fileName, const QStringList& inArgs){
-    if (QFile::exists(fileName.toLocalFile() + ".dng")){
+
+    int format = settings->value(StringConstants::outputFormat).toInt();
+    QString endingString = ".dng";
+    switch (format){
+    case 1:
+        endingString = ".jpg";
+        break;
+    case 2:
+        endingString = ".tif";
+        break;
+    }
+
+    if (QFile::exists(fileName.toLocalFile() + endingString)){
         return;
     }
     QString tmpFileName = fileName.toLocalFile() + ".dng.tmp";
@@ -85,7 +97,6 @@ void CProcessingThread::convertX3FFile(const QUrl& fileName, const QStringList& 
     exiftoolsargs << "-tagsFromFile";
     exiftoolsargs << fileName.toLocalFile();
     exiftoolsargs << "-all:all";
-    int format = settings->value(StringConstants::outputFormat).toInt();
     switch(format){
     case 1:
         //immaterial for jpgs

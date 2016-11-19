@@ -89,6 +89,7 @@ void MainWindow::browse()
 void MainWindow::configureSettings(){
     //changeUI(false);
     mPreferencesPane->exec(); // there are crashes if I use modal show, so I keep the dialog around instead
+    find();
     //changeUI(true);
 }
 
@@ -116,11 +117,22 @@ void MainWindow::showFiles(const QStringList &files)
 {
     filesTable->setRowCount(0);
     QDir actualDirectory = QDir(currentDir);
+    int format = settings->value(StringConstants::outputFormat).toInt();
+    QString endingString = ".dng";
+    switch (format){
+    case 1:
+        endingString = ".jpg";
+        break;
+    case 2:
+        endingString = ".tif";
+        break;
+    }
+
     for (int i = 0; i < files.size(); ++i) {
         QFile file(actualDirectory.absoluteFilePath(files[i]));
         qint64 size = QFileInfo(file).size();
         QString hasExtractedFile = "Processed!";
-        if (!fileExists(actualDirectory.absoluteFilePath(files[i]) + ".dng")){
+        if (!fileExists(actualDirectory.absoluteFilePath(files[i]) + endingString)){
             hasExtractedFile = "Not yet";
         }
 
@@ -195,11 +207,11 @@ void MainWindow::updateProgress(int currIndex, int totalNumber){
     filesConvertLabel->setText(QString::number(currIndex + 1) +
                                " file(s) converted of " +
                                QString::number(totalNumber));
-    if (currIndex + 1 == totalNumber){
+    /*if (currIndex + 1 == totalNumber){
         filesConvertLabel->setText(QString::number(currIndex + 1) + tr(" file(s) processed") +
                                  (" (Double click on a file to convert it)"));
         changeUI(true);
-    }
+    }*/
     find();
 }
 
@@ -227,7 +239,7 @@ void MainWindow::convertAllFiles()
 
     connect (mProcessingThread, SIGNAL(progress(int, int)), this, SLOT(updateProgress(int, int)));
     connect (mProcessingThread, SIGNAL(error_message(QString, QString)), this, SLOT(error_message(QString, QString)));
-    connect (mProcessingThread, SIGNAL(finishedProcessing), this, SLOT(finishedProcessing));
+    connect (mProcessingThread, SIGNAL(finishedProcessing()), this, SLOT(finishedProcessing()));
 
     mProcessingThread->start();
 }
