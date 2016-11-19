@@ -14,6 +14,7 @@ class QTableWidgetItem;
 class QSettings;
 QT_END_NAMESPACE
 class CPreferencesPane;
+class CProcessingThread;
 
 /*
  * This basic class borrows heavily from the findfiles example.
@@ -39,12 +40,14 @@ private slots:
     void convertFile(int row, int column);
     void convertAllFiles();
 
+    void updateProgress(int currIndex, int totalNumber);
+    void finishedProcessing();
+    void error_message(QString errorTitle, QString errorBody);
+
 private:
 
     void showFiles(const QStringList &files);
     void createFilesTable();
-    void convertX3FFile(const QUrl& fileName, const QStringList& inArgs);
-    QStringList buildArgList();
     void changeUI(const bool& ui_toggle);
     void configureSettings();
     bool checkSettings();
@@ -60,6 +63,7 @@ private:
     QStringList completeFileList;
 
     CPreferencesPane *mPreferencesPane;
+    CProcessingThread *mProcessingThread;
 
     QString currentDir;
     QSettings *settings;

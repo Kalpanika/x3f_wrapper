@@ -5,6 +5,7 @@
 #include "ui_mainwindow.h"
 #include "cpreferencespane.h"
 #include "stringconstants.h"
+#include "cprocessingthread.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent)
@@ -67,91 +68,6 @@ void MainWindow::changeUI(const bool& ui_toggle){
     filesTable->setEnabled(ui_toggle);
     directoryLineEdit->setEnabled(ui_toggle);
     configureButton->setEnabled(ui_toggle);
-}
-
-void MainWindow::convertX3FFile(const QUrl& fileName, const QStringList& inArgs){
-    if (QFile::exists(fileName.toLocalFile() + ".dng")){
-        return;
-    }
-    QString tmpFileName = fileName.toLocalFile() + ".dng.tmp";
-    if (QFile::exists(tmpFileName)){
-        bool removalSuccessful = QFile::remove(tmpFileName);
-        if (!removalSuccessful){
-            QMessageBox::critical(NULL, "A temp file exists and needs to be deleted.",
-                                  "A file named " + tmpFileName + " exists and needs to be deleted before processing can continue.");
-            return;
-        }
-    }
-
-    QString converter = settings->value(StringConstants::x3fLocation).toString();
-
-    QStringList arguments = inArgs;
-    arguments << fileName.toLocalFile();
-    changeUI(false);
-    int exitCode = QProcess::execute(converter, arguments);
-    if (exitCode != 0){
-        QMessageBox::critical(NULL, "Something went wrong.",
-                              "Something happened while processing the image.  Error code: " + QString::number(exitCode));
-    }
-
-    QString exiftools = settings->value(StringConstants::exifToolsLocation).toString();
-    QStringList exiftoolsargs;
-    exiftoolsargs << exiftools;
-    exiftoolsargs << "-TagsFromFile";
-    exiftoolsargs << fileName.toLocalFile();
-    exiftoolsargs << "-all:all";
-    int format = settings->value(StringConstants::outputFormat).toInt();
-    switch(format){
-    case 1:
-        //immaterial for jpgs
-        break;
-    case 2:
-        exiftoolsargs << fileName.toLocalFile() + ".tiff";
-        exitCode = QProcess::execute(exiftools, exiftoolsargs);
-        break;
-    default:
-        exiftoolsargs << fileName.toLocalFile() + ".dng";
-        exitCode = QProcess::execute(exiftools, exiftoolsargs);
-    }
-    //qDebug() << exiftoolsargs;
-    changeUI(true);
-    showFiles(completeFileList);
-}
-
-QStringList MainWindow::buildArgList(){
-    QStringList output;
-    if (!settings->value(StringConstants::denoise).toBool()){
-        output << "-no-denoise";
-    }
-    if (settings->value(StringConstants::compress).toBool()){
-        output << "-compress";
-    }
-    if (settings->value(StringConstants::ocl).toBool()){
-        output << "-ocl";
-    }
-    // for the color, etc-- assume 0 is the default
-    int val = settings->value(StringConstants::outputColor).toInt();
-    if (val > 0){
-        output << "-color";
-        output << StringConstants::colorOptions[val];
-    }
-    val = settings->value(StringConstants::outputFormat).toInt();
-    switch(val){
-    case 1:  // "Embedded JPG"
-        output << "-jpg";
-        break;
-    case 2:  // "TIFF"
-        output << "-tiff";
-        break;
-    default:  // "DNG", ie, do nothing
-        break;
-    }
-    val = settings->value(StringConstants::outputWB).toInt();
-    if (val > 0){
-        output << "-wb"; // We sure this is the right way to set up the WB call?
-        output << StringConstants::wbOptions[val];
-    }
-    return output;
 }
 
 void MainWindow::browse()
@@ -264,17 +180,27 @@ void MainWindow::convertFile(int row, int /* column */)
         return;
     }
     changeUI(false);
-    filesConvertLabel->setText("Processing a single image.");
     QTableWidgetItem *item = filesTable->item(row, 0);
 
-    QDir actualDirectory = QDir(currentDir);
-    QStringList arguments = buildArgList();
-    convertX3FFile(QUrl::fromLocalFile(actualDirectory.absoluteFilePath(item->text())),
-                   arguments);
-    filesConvertLabel->setText(tr("1 file(s) processed") +
-                             (" (Double click on a file to convert it)"));
+    QStringList files;
+    files << item->text();
+    completeFileList = files;
+    convertAllFiles();
+}
 
+void MainWindow::updateProgress(int currIndex, int totalNumber){
+    filesConvertLabel->setText(tr("%1 file(s) converted of %2").arg(currIndex, totalNumber));
+}
+
+void MainWindow::finishedProcessing(){
+    filesConvertLabel->setText(tr("File(s) processed") +
+                             (" (Double click on a file to convert it)"));
     changeUI(true);
+    find();
+}
+
+void MainWindow::error_message(QString errorTitle, QString errorBody){
+    QMessageBox::critical(this, errorTitle, errorBody);
 }
 
 void MainWindow::convertAllFiles()
@@ -284,16 +210,13 @@ void MainWindow::convertAllFiles()
     }
 
     changeUI(false);
-    filesConvertLabel->setText("Processing multiple images.");
+    filesConvertLabel->setText("Starting Processing");
     QDir actualDirectory = QDir(currentDir);
-    QStringList arguments = buildArgList();
-    for (int i = 0; i < completeFileList.size(); ++i) {
-        convertX3FFile(QUrl::fromLocalFile(actualDirectory.absoluteFilePath(completeFileList[i])),
-                       arguments);
-        filesConvertLabel->setText(tr("%1 of %2 file(s) converted.").arg(i, completeFileList.size()));
-    }
-    filesConvertLabel->setText(tr("%1 file(s) converted").arg(completeFileList.size()) +
-                             (" (Double click on a file to convert it)"));
-    changeUI(true);
+    mProcessingThread = new CProcessingThread(completeFileList, actualDirectory);
 
+    connect (mProcessingThread, SIGNAL(progress(int, int)), this, SLOT(updateProgress));
+    connect (mProcessingThread, SIGNAL(error_message(QString, QString)), this, SLOT(error_message));
+    connect (mProcessingThread, SIGNAL(finished), this, SLOT(finishedProcessing));
+
+    mProcessingThread->start();
 }

@@ -14,8 +14,10 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     cpreferencespane.cpp \
-    stringconstants.cpp
+    stringconstants.cpp \
+    cprocessingthread.cpp
 
 HEADERS  += mainwindow.h \
     cpreferencespane.h \
-    stringconstants.h
+    stringconstants.h \
+    cprocessingthread.h
