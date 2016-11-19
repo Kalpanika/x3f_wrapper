@@ -13,13 +13,14 @@ MainWindow::MainWindow(QWidget *parent) :
     browseButton = new QPushButton(tr("&Browse..."), this);
     connect(browseButton, &QAbstractButton::clicked, this, &MainWindow::browse);
 
-    convertAllButton = new QPushButton(tr("&Convert unprocessed"), this);
-    connect(convertAllButton, &QAbstractButton::clicked,
-            this, &MainWindow::convertAllFiles);
-
     configureButton = new QPushButton(tr("Con&figure Settings"), this);
     connect(configureButton, &QAbstractButton::clicked,
             this, &MainWindow::configureSettings);
+    configureButton->setEnabled(true);
+
+    convertAllButton = new QPushButton(tr("&Convert unprocessed"), this);
+    connect(convertAllButton, &QAbstractButton::clicked,
+            this, &MainWindow::convertAllFiles);
 
     //get settings here to get the page
     settings = new QSettings;
@@ -43,9 +44,9 @@ MainWindow::MainWindow(QWidget *parent) :
     mainLayout->addWidget(directoryLineEdit, 0, 1);
     mainLayout->addWidget(browseButton, 0, 2);
     mainLayout->addWidget(filesTable, 1, 0, 1, 3);
-    mainLayout->addWidget(filesConvertLabel, 2, 1, 1, 2);
-    mainLayout->addWidget(convertAllButton, 2, 2);
     mainLayout->addWidget(configureButton, 2, 0);
+    mainLayout->addWidget(filesConvertLabel, 2, 1, 1, 2);
+    mainLayout->addWidget(convertAllButton, 3, 2);
     setLayout(mainLayout);
 
     setWindowTitle(tr("Convert X3F Files"));
@@ -147,9 +148,9 @@ void MainWindow::browse()
 }
 
 void MainWindow::configureSettings(){
-    changeUI(false);
+    //changeUI(false);
     mPreferencesPane->exec();
-    changeUI(true);
+    //changeUI(true);
 }
 
 void MainWindow::find()
@@ -234,6 +235,7 @@ void MainWindow::convertFile(int row, int /* column */)
         return;
     }
 
+    changeUI(false);
     filesConvertLabel->setText("Processing a single image.");
     QTableWidgetItem *item = filesTable->item(row, 0);
 
@@ -243,10 +245,24 @@ void MainWindow::convertFile(int row, int /* column */)
                    arguments);
     filesConvertLabel->setText(tr("1 file(s) processed") +
                              (" (Double click on a file to convert it)"));
+
+    changeUI(true);
 }
 
 void MainWindow::convertAllFiles()
 {
+    if (settings->value(StringConstants::x3fLocation).toString().length() < 1){
+        QMessageBox::critical(NULL, "Please set the location of the x3f extractor executable",
+                              "This program needs the x3f_extract program to be installed.");
+        return;
+    }
+    if (settings->value(StringConstants::exifToolsLocation).toString().length() < 1){
+        QMessageBox::critical(NULL, "Please set the location of the exiftools executable",
+                              "This program needs the exif tools program to be installed.");
+        return;
+    }
+
+    changeUI(false);
     filesConvertLabel->setText("Processing multiple images.");
     QDir actualDirectory = QDir(currentDir);
     QStringList arguments = buildArgList();
@@ -257,5 +273,6 @@ void MainWindow::convertAllFiles()
     }
     filesConvertLabel->setText(tr("%1 file(s) converted").arg(completeFileList.size()) +
                              (" (Double click on a file to convert it)"));
+    changeUI(true);
 
 }

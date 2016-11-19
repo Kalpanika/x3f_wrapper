@@ -23,9 +23,7 @@ CPreferencesPane::CPreferencesPane(QDialog *parent) : QDialog(parent)
     colorComboBox->setEditable(false);
 
     denoise = new QCheckBox("Denoise?  (usually yes)");
-
     compress = new QCheckBox("Compress output? (usually yes, only used on DNG and TIFF output)");
-
     ocl = new QCheckBox("Use OpenCL? (faster, less stable; use at your own risk)");
 
     whiteBalanceComboBox = new QComboBox;
