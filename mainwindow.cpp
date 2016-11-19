@@ -54,6 +54,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     mPreferencesPane = new CPreferencesPane();
     find();
+    if (!checkSettings()){
+        configureSettings();
+    }
 }
 
 MainWindow::~MainWindow()
