@@ -45,8 +45,8 @@ MainWindow::MainWindow(QWidget *parent) :
     mainLayout->addWidget(browseButton, 0, 2);
     mainLayout->addWidget(filesTable, 1, 0, 1, 3);
     mainLayout->addWidget(configureButton, 2, 0);
-    mainLayout->addWidget(filesConvertLabel, 2, 1, 1, 2);
-    mainLayout->addWidget(convertAllButton, 3, 2);
+    mainLayout->addWidget(filesConvertLabel, 2, 1);
+    mainLayout->addWidget(convertAllButton, 2, 2);
     setLayout(mainLayout);
 
     setWindowTitle(tr("Convert X3F Files"));
@@ -93,6 +93,27 @@ void MainWindow::convertX3FFile(const QUrl& fileName, const QStringList& inArgs)
         QMessageBox::critical(NULL, "Something went wrong.",
                               "Something happened while processing the image.  Error code: " + QString::number(exitCode));
     }
+
+    QString exiftools = settings->value(StringConstants::exifToolsLocation).toString();
+    QStringList exiftoolsargs;
+    exiftoolsargs << exiftools;
+    exiftoolsargs << "-TagsFromFile";
+    exiftoolsargs << fileName.toLocalFile();
+    exiftoolsargs << "-all:all";
+    int format = settings->value(StringConstants::outputFormat).toInt();
+    switch(format){
+    case 1:
+        //immaterial for jpgs
+        break;
+    case 2:
+        exiftoolsargs << fileName.toLocalFile() + ".tiff";
+        exitCode = QProcess::execute(exiftools, exiftoolsargs);
+        break;
+    default:
+        exiftoolsargs << fileName.toLocalFile() + ".dng";
+        exitCode = QProcess::execute(exiftools, exiftoolsargs);
+    }
+    //qDebug() << exiftoolsargs;
     changeUI(true);
     showFiles(completeFileList);
 }
@@ -149,7 +170,7 @@ void MainWindow::browse()
 
 void MainWindow::configureSettings(){
     //changeUI(false);
-    mPreferencesPane->exec();
+    mPreferencesPane->exec(); // there are crashes if I use modal show, so I keep the dialog around instead
     //changeUI(true);
 }
 

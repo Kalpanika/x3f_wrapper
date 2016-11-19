@@ -47,6 +47,7 @@ private:
     QStringList buildArgList();
     void changeUI(const bool& ui_toggle);
     void configureSettings();
+    bool checkSettings();
 
     QLineEdit *directoryLineEdit;
     QLabel *directoryLabel;
