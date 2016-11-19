@@ -207,11 +207,6 @@ void MainWindow::updateProgress(int currIndex, int totalNumber){
     filesConvertLabel->setText(QString::number(currIndex + 1) +
                                " file(s) converted of " +
                                QString::number(totalNumber));
-    /*if (currIndex + 1 == totalNumber){
-        filesConvertLabel->setText(QString::number(currIndex + 1) + tr(" file(s) processed") +
-                                 (" (Double click on a file to convert it)"));
-        changeUI(true);
-    }*/
     find();
 }
 
