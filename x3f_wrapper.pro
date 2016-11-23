@@ -15,10 +15,10 @@ CONFIG += static
 SOURCES += main.cpp\
         mainwindow.cpp \
     cpreferencespane.cpp \
-    stringconstants.cpp \
-    cprocessingthread.cpp
+    cprocessingthread.cpp \
+    settingsconstants.cpp
 
 HEADERS  += mainwindow.h \
     cpreferencespane.h \
-    stringconstants.h \
-    cprocessingthread.h
+    cprocessingthread.h \
+    settingsconstants.h

@@ -47,6 +47,7 @@ private:
     QLineEdit *exiftoolsLocation;
     QPushButton *browseX3FButton;
     QPushButton *browseEXIFButton;
+    QPushButton *closeButton;
 
     QSettings *settings;
 };

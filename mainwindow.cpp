@@ -3,7 +3,7 @@
 
 #include "mainwindow.h"
 #include "cpreferencespane.h"
-#include "stringconstants.h"
+#include "settingsconstants.h"
 #include "cprocessingthread.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -24,9 +24,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //get settings here to get the page
     settings = new QSettings;
-    int dirLen = settings->value(StringConstants::lastDir).toString().length();
+    int dirLen = settings->value(SettingsConstants::lastDir).toString().length();
     if (dirLen){
-        currentDir = settings->value(StringConstants::lastDir).toString();
+        currentDir = settings->value(SettingsConstants::lastDir).toString();
     } else {
         currentDir = QDir::currentPath();
     }
@@ -81,7 +81,7 @@ void MainWindow::browse()
     directoryLineEdit->setText(directory);
 
     currentDir = directory;
-    settings->setValue(StringConstants::lastDir, directory);
+    settings->setValue(SettingsConstants::lastDir, directory);
     settings->sync();
     find();
 }
@@ -117,7 +117,7 @@ void MainWindow::showFiles(const QStringList &files)
 {
     filesTable->setRowCount(0);
     QDir actualDirectory = QDir(currentDir);
-    int format = settings->value(StringConstants::outputFormat).toInt();
+    int format = settings->value(SettingsConstants::outputFormat).toInt();
     QString endingString = ".dng";
     switch (format){
     case 1:
@@ -175,24 +175,21 @@ void MainWindow::createFilesTable()
 
 bool MainWindow::checkSettings(){
     // use this function to check to see if the settings are properly configured
-    if (settings->value(StringConstants::x3fLocation).toString().length() < 1){
+    if (settings->value(SettingsConstants::x3fLocation).toString().length() < 1){
         QMessageBox::critical(NULL, "Please set the location of the x3f extractor executable",
                               "This program needs the x3f_extract program to be installed.  You can get it here: <a href=\"https://github.com/Kalpanika/x3f/releases\">https://github.com/Kalpanika/x3f/releases</a>");
         return false;
     }
-    if (settings->value(StringConstants::exifToolsLocation).toString().length() < 1){
+    if (settings->value(SettingsConstants::exifToolsLocation).toString().length() < 1){
         QMessageBox::critical(NULL, "Please set the location of the exiftools executable",
-                              "This program needs the exif tools program to be installed.  You can get it here: <a href=\"http://www.sno.phy.queensu.ca/~phil/exiftool/\">http://www.sno.phy.queensu.ca/~phil/exiftool/</a>");
-        return false;
+                              "This program uses the exif tools executable to copy metadata to the final file.  If you don't have it installed, metadata is not copied.  You can get it here: <a href=\"http://www.sno.phy.queensu.ca/~phil/exiftool/\">http://www.sno.phy.queensu.ca/~phil/exiftool/</a>");
+        //return false;
     }
     return true;
 }
 
 void MainWindow::convertFile(int row, int /* column */)
 {
-    if (!checkSettings()){
-        return;
-    }
     changeUI(false);
     QTableWidgetItem *item = filesTable->item(row, 0);
 
@@ -211,10 +208,10 @@ void MainWindow::updateProgress(int currIndex, int totalNumber){
 }
 
 void MainWindow::finishedProcessing(){
-    filesConvertLabel->setText(tr("File(s) processed") +
-                             (" (Double click on a file to convert it)"));
     changeUI(true);
     find();
+    filesConvertLabel->setText(tr("File(s) were processed") +
+                             (" (Double click on a file to convert it)"));
 }
 
 void MainWindow::error_message(QString errorTitle, QString errorBody){

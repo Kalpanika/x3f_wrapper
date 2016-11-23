@@ -1,10 +1,10 @@
-#ifndef STRINGCONSTANTS_H
-#define STRINGCONSTANTS_H
+#ifndef SETTINGSCONSTANTS_H
+#define SETTINGSCONSTANTS_H
 
 #include <QString>
 #include <QStringList>
 
-class StringConstants{
+class SettingsConstants{
 public:
     static const QString lastDir;           //type = string
     static const QString denoise;           //type = bool
@@ -19,6 +19,16 @@ public:
     static const QStringList wbOptions;
     static const QStringList colorOptions;
     static const QStringList formatOptions;
+
+    static const QString lastDirDefault;
+    static const bool denoiseDefault;
+    static const bool compressDefault;
+    static const bool oclDefault;
+    static const int outputColorDefault;
+    static const int outputWBDefault;
+    static const int outputFormatDefault;
+    static const QString x3fLocationDefault;
+    static const QString exifToolsLocationDefault;
 };
 
-#endif // STRINGCONSTANTS_H
+#endif // SETTINGSCONSTANTS_H

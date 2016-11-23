@@ -1,6 +1,6 @@
 #include "cprocessingthread.h"
 #include <QSettings>
-#include "stringconstants.h"
+#include "settingsconstants.h"
 #include <QProcess>
 
 
@@ -16,22 +16,22 @@ CProcessingThread::CProcessingThread(const QStringList& inFiles,
 
 QStringList CProcessingThread::buildArgList(){
     QStringList output;
-    if (!settings->value(StringConstants::denoise).toBool()){
+    if (!settings->value(SettingsConstants::denoise).toBool()){
         output << "-no-denoise";
     }
-    if (settings->value(StringConstants::compress).toBool()){
+    if (settings->value(SettingsConstants::compress).toBool()){
         output << "-compress";
     }
-    if (settings->value(StringConstants::ocl).toBool()){
+    if (settings->value(SettingsConstants::ocl).toBool()){
         output << "-ocl";
     }
     // for the color, etc-- assume 0 is the default
-    int val = settings->value(StringConstants::outputColor).toInt();
+    int val = settings->value(SettingsConstants::outputColor).toInt();
     if (val > 0){
         output << "-color";
-        output << StringConstants::colorOptions[val];
+        output << SettingsConstants::colorOptions[val];
     }
-    val = settings->value(StringConstants::outputFormat).toInt();
+    val = settings->value(SettingsConstants::outputFormat).toInt();
     switch(val){
     case 1:  // "Embedded JPG"
         output << "-jpg";
@@ -42,10 +42,10 @@ QStringList CProcessingThread::buildArgList(){
     default:  // "DNG", ie, do nothing
         break;
     }
-    val = settings->value(StringConstants::outputWB).toInt();
+    val = settings->value(SettingsConstants::outputWB).toInt();
     if (val > 0){
         output << "-wb"; // We sure this is the right way to set up the WB call?
-        output << StringConstants::wbOptions[val];
+        output << SettingsConstants::wbOptions[val];
     }
     return output;
 }
@@ -53,7 +53,7 @@ QStringList CProcessingThread::buildArgList(){
 
 void CProcessingThread::convertX3FFile(const QUrl& fileName, const QStringList& inArgs){
 
-    int format = settings->value(StringConstants::outputFormat).toInt();
+    int format = settings->value(SettingsConstants::outputFormat).toInt();
     QString endingString = ".dng";
     switch (format){
     case 1:
@@ -77,11 +77,18 @@ void CProcessingThread::convertX3FFile(const QUrl& fileName, const QStringList& 
         }
     }
 
-    QString converter = settings->value(StringConstants::x3fLocation).toString();
+    QString converter = settings->value(SettingsConstants::x3fLocation).toString();
 
     QStringList arguments = inArgs;
     arguments << fileName.toLocalFile();
     int exitCode = QProcess::execute(converter, arguments);
+    if (exitCode == -2){
+        emit error_message("Is the x3f extractor properly set?",
+                           "Error code: " + QString::number(exitCode) +
+                           " was returned, suggesting that the x3f executable provided in the preferences is not runnable.  Argument list: [" + arguments.join(", ") + "]");
+
+        return;
+    }
     if (exitCode != 0){
         emit error_message("Something went wrong.",
                            "Something happened while processing the image.  Error code: " + QString::number(exitCode) +
@@ -90,7 +97,11 @@ void CProcessingThread::convertX3FFile(const QUrl& fileName, const QStringList& 
         return;
     }
 
-    QString exiftools = settings->value(StringConstants::exifToolsLocation).toString();
+    QString exiftools = settings->value(SettingsConstants::exifToolsLocation).toString();
+
+    if (exiftools.length() < 1){
+        return;  // no specified exif tool location, so don't run it
+    }
     QStringList exiftoolsargs;
     exiftoolsargs << exiftools;
     exiftoolsargs << "-overwrite_original";
@@ -114,11 +125,16 @@ void CProcessingThread::convertX3FFile(const QUrl& fileName, const QStringList& 
 void CProcessingThread::run()
 {
     QStringList arguments = buildArgList();
-    for (int i = 0; i < files.size(); ++i) {
-        convertX3FFile(QUrl::fromLocalFile(currentDir.absoluteFilePath(files[i])),
-                       arguments);
-        emit progress(i, files.size());
+    try{
+        for (int i = 0; i < files.size(); ++i) {
+            convertX3FFile(QUrl::fromLocalFile(currentDir.absoluteFilePath(files[i])),
+                           arguments);
+            emit progress(i, files.size());
+        }
+    } catch(...){
+        //something broke, but for now, do nothing.
     }
+
     emit finishedProcessing();
-    sleep(1);  //to make sure the final signal is emitted before the thread is killed
+    //sleep(1);  //to make sure the final signal is emitted before the thread is killed
 }

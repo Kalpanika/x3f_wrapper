@@ -1,13 +1,13 @@
 #include <QtWidgets>
 #include "cpreferencespane.h"
-#include "stringconstants.h"
+#include "settingsconstants.h"
 
 CPreferencesPane::CPreferencesPane(QDialog *parent) : QDialog(parent)
 {
     formatComboBox = new QComboBox;
     int i;
-    for (i = 0; i < StringConstants::formatOptions.size(); i++){
-        formatComboBox->addItem(StringConstants::formatOptions[i]);
+    for (i = 0; i < SettingsConstants::formatOptions.size(); i++){
+        formatComboBox->addItem(SettingsConstants::formatOptions[i]);
     }
     formatComboBox->setEditable(false);
     formatLabel = new QLabel("Output Format:");
@@ -17,8 +17,8 @@ CPreferencesPane::CPreferencesPane(QDialog *parent) : QDialog(parent)
 
     colorComboBox = new QComboBox;
     colorLabel = new QLabel("Color Mode:");
-    for (i = 0; i < StringConstants::colorOptions.size(); i++){
-        colorComboBox->addItem(StringConstants::colorOptions[i]);
+    for (i = 0; i < SettingsConstants::colorOptions.size(); i++){
+        colorComboBox->addItem(SettingsConstants::colorOptions[i]);
     };
     colorComboBox->setEditable(false);
 
@@ -27,8 +27,8 @@ CPreferencesPane::CPreferencesPane(QDialog *parent) : QDialog(parent)
     ocl = new QCheckBox("Use OpenCL? (faster, less stable; use at your own risk)");
 
     whiteBalanceComboBox = new QComboBox;
-    for (i = 0; i < StringConstants::wbOptions.size(); i++){
-        whiteBalanceComboBox->addItem(StringConstants::wbOptions[i]);
+    for (i = 0; i < SettingsConstants::wbOptions.size(); i++){
+        whiteBalanceComboBox->addItem(SettingsConstants::wbOptions[i]);
     };
     whiteBalanceLabel = new QLabel("White Balance:");
 
@@ -38,6 +38,9 @@ CPreferencesPane::CPreferencesPane(QDialog *parent) : QDialog(parent)
     resetButton = new QPushButton(tr("&Reset"), this);
     connect(resetButton, &QAbstractButton::clicked,
             this, &CPreferencesPane::resetPreferences);
+    closeButton = new QPushButton(tr("&Close"), this);
+    connect(closeButton, &QAbstractButton::clicked,
+            this, &QDialog::close);
 
     extractLocation = new QLineEdit;
     exiftoolsLocation = new QLineEdit;
@@ -54,22 +57,23 @@ CPreferencesPane::CPreferencesPane(QDialog *parent) : QDialog(parent)
     QGridLayout *preferencesLayout = new QGridLayout;
     int row = 0;
     preferencesLayout->addWidget(formatLabel, row, 0);
-    preferencesLayout->addWidget(formatComboBox, row++, 1);
+    preferencesLayout->addWidget(formatComboBox, row++, 1, 1, 2);
     preferencesLayout->addWidget(denoise, row++, 0, 1, 2);
     preferencesLayout->addWidget(compress, row++, 0, 1, 2);
     preferencesLayout->addWidget(ocl, row++, 0, 1, 2);
     preferencesLayout->addWidget(colorLabel, row, 0);
-    preferencesLayout->addWidget(colorComboBox, row++, 1);
+    preferencesLayout->addWidget(colorComboBox, row++, 1, 1, 2);
     preferencesLayout->addWidget(whiteBalanceLabel, row, 0);
-    preferencesLayout->addWidget(whiteBalanceComboBox, row++, 1);
+    preferencesLayout->addWidget(whiteBalanceComboBox, row++, 1, 1, 2);
     preferencesLayout->addWidget(extractLocationLabel, row, 0);
-    preferencesLayout->addWidget(extractLocation, row, 1);
-    preferencesLayout->addWidget(browseX3FButton, row++, 2);
+    preferencesLayout->addWidget(extractLocation, row, 1, 1, 2);
+    preferencesLayout->addWidget(browseX3FButton, row++, 3);
     preferencesLayout->addWidget(exiftoolsLocationLabel, row, 0);
-    preferencesLayout->addWidget(exiftoolsLocation, row, 1);
-    preferencesLayout->addWidget(browseEXIFButton, row++, 2);
-    preferencesLayout->addWidget(saveButton, row, 0);
-    preferencesLayout->addWidget(resetButton, row++, 2);
+    preferencesLayout->addWidget(exiftoolsLocation, row, 1, 1, 2);
+    preferencesLayout->addWidget(browseEXIFButton, row++, 3);
+    preferencesLayout->addWidget(saveButton, row, 1);
+    preferencesLayout->addWidget(resetButton, row, 2);
+    preferencesLayout->addWidget(closeButton, row++, 3);
     setLayout(preferencesLayout);
 
     resize(600, 240);
@@ -82,37 +86,37 @@ CPreferencesPane::~CPreferencesPane(){
 }
 
 void CPreferencesPane::loadPreferences(){
-    denoise->setChecked(settings->value(StringConstants::denoise).toBool());
-    compress->setChecked(settings->value(StringConstants::compress).toBool());
-    ocl->setChecked(settings->value(StringConstants::ocl).toBool());
-    formatComboBox->setCurrentIndex(settings->value(StringConstants::outputFormat).toInt());
-    colorComboBox->setCurrentIndex(settings->value(StringConstants::outputColor).toInt());
-    whiteBalanceComboBox->setCurrentIndex(settings->value(StringConstants::outputWB).toInt());
-    extractLocation->setText(settings->value(StringConstants::x3fLocation).toString());
-    exiftoolsLocation->setText(settings->value(StringConstants::exifToolsLocation).toString());
+    denoise->setChecked(settings->value(SettingsConstants::denoise).toBool());
+    compress->setChecked(settings->value(SettingsConstants::compress).toBool());
+    ocl->setChecked(settings->value(SettingsConstants::ocl).toBool());
+    formatComboBox->setCurrentIndex(settings->value(SettingsConstants::outputFormat).toInt());
+    colorComboBox->setCurrentIndex(settings->value(SettingsConstants::outputColor).toInt());
+    whiteBalanceComboBox->setCurrentIndex(settings->value(SettingsConstants::outputWB).toInt());
+    extractLocation->setText(settings->value(SettingsConstants::x3fLocation).toString());
+    exiftoolsLocation->setText(settings->value(SettingsConstants::exifToolsLocation).toString());
 }
 
 void CPreferencesPane::savePreferences(){
-    settings->setValue(StringConstants::denoise, denoise->isChecked());
-    settings->setValue(StringConstants::compress, compress->isChecked());
-    settings->setValue(StringConstants::ocl, ocl->isChecked());
-    settings->setValue(StringConstants::outputFormat, formatComboBox->currentIndex());
-    settings->setValue(StringConstants::outputColor, colorComboBox->currentIndex());
-    settings->setValue(StringConstants::outputWB, whiteBalanceComboBox->currentIndex());
-    settings->setValue(StringConstants::x3fLocation, extractLocation->text());
-    settings->setValue(StringConstants::exifToolsLocation, exiftoolsLocation->text());
+    settings->setValue(SettingsConstants::denoise, denoise->isChecked());
+    settings->setValue(SettingsConstants::compress, compress->isChecked());
+    settings->setValue(SettingsConstants::ocl, ocl->isChecked());
+    settings->setValue(SettingsConstants::outputFormat, formatComboBox->currentIndex());
+    settings->setValue(SettingsConstants::outputColor, colorComboBox->currentIndex());
+    settings->setValue(SettingsConstants::outputWB, whiteBalanceComboBox->currentIndex());
+    settings->setValue(SettingsConstants::x3fLocation, extractLocation->text());
+    settings->setValue(SettingsConstants::exifToolsLocation, exiftoolsLocation->text());
     settings->sync();
 }
 
 void CPreferencesPane::resetPreferences(){
-    denoise->setChecked(true);
-    compress->setChecked(true);
-    ocl->setChecked(true);
-    formatComboBox->setCurrentIndex(0);
-    colorComboBox->setCurrentIndex(0);
-    whiteBalanceComboBox->setCurrentIndex(0);
-    extractLocation->setText("");
-    exiftoolsLocation->setText("");
+    denoise->setChecked(SettingsConstants::denoiseDefault);
+    compress->setChecked(SettingsConstants::compressDefault);
+    ocl->setChecked(SettingsConstants::oclDefault);
+    formatComboBox->setCurrentIndex(SettingsConstants::outputFormatDefault);
+    colorComboBox->setCurrentIndex(SettingsConstants::outputColorDefault);
+    whiteBalanceComboBox->setCurrentIndex(SettingsConstants::outputWBDefault);
+    extractLocation->setText(SettingsConstants::x3fLocationDefault);
+    exiftoolsLocation->setText(SettingsConstants::exifToolsLocationDefault);
     savePreferences();
 }
 
