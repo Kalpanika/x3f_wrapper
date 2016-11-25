@@ -39,6 +39,8 @@ private:
 
     QStringList buildArgList();
     void convertX3FFile(const QUrl& fileName, const QStringList& inArgs);
+    bool runX3FConversion(const QUrl& fileName, const QStringList& inArgs);
+    bool runExifTool(const QUrl& fileName);
 };
 
 #endif // CPROCESSINGTHREAD_H

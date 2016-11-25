@@ -50,9 +50,7 @@ QStringList CProcessingThread::buildArgList(){
     return output;
 }
 
-
-void CProcessingThread::convertX3FFile(const QUrl& fileName, const QStringList& inArgs){
-
+bool CProcessingThread::runX3FConversion(const QUrl& fileName, const QStringList& inArgs){
     int format = settings->value(SettingsConstants::outputFormat).toInt();
     QString endingString = ".dng";
     switch (format){
@@ -65,7 +63,7 @@ void CProcessingThread::convertX3FFile(const QUrl& fileName, const QStringList& 
     }
 
     if (QFile::exists(fileName.toLocalFile() + endingString)){
-        return;
+        return true;
     }
     QString tmpFileName = fileName.toLocalFile() + ".dng.tmp";
     if (QFile::exists(tmpFileName)){
@@ -73,7 +71,7 @@ void CProcessingThread::convertX3FFile(const QUrl& fileName, const QStringList& 
         if (!removalSuccessful){
             emit error_message("A temp file exists and needs to be deleted.",
                                "A file named " + tmpFileName + " exists and needs to be deleted before processing can continue.");
-            return;
+            return false;
         }
     }
 
@@ -87,27 +85,34 @@ void CProcessingThread::convertX3FFile(const QUrl& fileName, const QStringList& 
                            "Error code: " + QString::number(exitCode) +
                            " was returned, suggesting that the x3f executable provided in the preferences is not runnable.  Argument list: [" + arguments.join(", ") + "]");
 
-        return;
+        return false;
     }
     if (exitCode != 0){
         emit error_message("Something went wrong.",
                            "Something happened while processing the image.  Error code: " + QString::number(exitCode) +
                            " argument list: [" + arguments.join(", ") + "]");
 
-        return;
+        return false;
     }
+    return true;
+}
 
+bool CProcessingThread::runExifTool(const QUrl& fileName){
     QString exiftools = settings->value(SettingsConstants::exifToolsLocation).toString();
-
+    int format = settings->value(SettingsConstants::outputFormat).toInt();
     if (exiftools.length() < 1){
-        return;  // no specified exif tool location, so don't run it
+        return false;  // no specified exif tool location, so don't run it
+    }
+    QFileInfo info(exiftools);
+    if (!info.isExecutable()){
+        return false;  // not an executable
     }
     QStringList exiftoolsargs;
-    exiftoolsargs << exiftools;
     exiftoolsargs << "-overwrite_original";
     exiftoolsargs << "-tagsFromFile";
     exiftoolsargs << fileName.toLocalFile();
     exiftoolsargs << "-all:all";
+    int exitCode = 0;
     switch(format){
     case 1:
         //immaterial for jpgs
@@ -119,6 +124,25 @@ void CProcessingThread::convertX3FFile(const QUrl& fileName, const QStringList& 
     default:
         exiftoolsargs << fileName.toLocalFile() + ".dng";
         exitCode = QProcess::execute(exiftools, exiftoolsargs);
+    }
+    if (exitCode == -2){
+        emit error_message("Is the exif extractor properly set?",
+                           "Error code: " + QString::number(exitCode) +
+                           " was returned, suggesting that the exif executable provided in the preferences is not runnable.  Argument list: [" + exiftoolsargs.join(", ") + "]");
+        return false;
+    }
+    if (exitCode != 0){
+        emit error_message("Something went wrong.",
+                           "Something happened while transferring exif information.  Error code: " + QString::number(exitCode) +
+                           " argument list: [" + exiftoolsargs.join(", ") + "]");
+        return false;
+    }
+    return true;
+}
+
+void CProcessingThread::convertX3FFile(const QUrl& fileName, const QStringList& inArgs){
+    if (runX3FConversion(fileName, inArgs)){
+        runExifTool(fileName);
     }
 }
 
