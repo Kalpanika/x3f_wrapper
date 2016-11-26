@@ -57,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if (!checkSettings()){
         configureSettings();
     }
+    mRunning = false;
 }
 
 MainWindow::~MainWindow()
@@ -70,6 +71,9 @@ void MainWindow::changeUI(const bool& ui_toggle){
     filesTable->setEnabled(ui_toggle);
     directoryLineEdit->setEnabled(ui_toggle);
     configureButton->setEnabled(ui_toggle);
+    if (ui_toggle){
+        convertAllButton->setText("&Convert unprocessed");
+    }
 }
 
 void MainWindow::browse()
@@ -225,6 +229,15 @@ void MainWindow::finishedProcessing(){
     find();
     filesConvertLabel->setText(tr("File(s) were processed") +
                              (" (Double click on a file to convert it)"));
+    mRunning = false;
+}
+
+void MainWindow::canceledProcessing(){
+    changeUI(true);
+    find();
+    filesConvertLabel->setText(tr("File processing was canceled.") +
+                             (" (Double click on a file to convert it)"));
+    mRunning = false;
 }
 
 void MainWindow::error_message(QString errorTitle, QString errorBody){
@@ -236,15 +249,25 @@ void MainWindow::convertAllFiles()
     if (!checkSettings()){
         return;
     }
+    if (mRunning){
+        mProcessingThread->stopNow();
+        convertAllButton->setText("Canceling...");
+        convertAllButton->setEnabled(false);
+    }
+    else{
+        mRunning = true;
+        changeUI(false);
+        convertAllButton->setText("Cancel");
+        convertAllButton->setEnabled(true);
+        filesConvertLabel->setText("Processing...");
+        QDir actualDirectory = QDir(currentDir);
+        mProcessingThread = new CProcessingThread(completeFileList, actualDirectory);
 
-    changeUI(false);
-    filesConvertLabel->setText("Processing...");
-    QDir actualDirectory = QDir(currentDir);
-    mProcessingThread = new CProcessingThread(completeFileList, actualDirectory);
+        connect (mProcessingThread, SIGNAL(progress(int, int)), this, SLOT(updateProgress(int, int)));
+        connect (mProcessingThread, SIGNAL(error_message(QString, QString)), this, SLOT(error_message(QString, QString)));
+        connect (mProcessingThread, SIGNAL(finishedProcessing()), this, SLOT(finishedProcessing()));
+        connect (mProcessingThread, SIGNAL(canceledProcessing()), this, SLOT(canceledProcessing()));
 
-    connect (mProcessingThread, SIGNAL(progress(int, int)), this, SLOT(updateProgress(int, int)));
-    connect (mProcessingThread, SIGNAL(error_message(QString, QString)), this, SLOT(error_message(QString, QString)));
-    connect (mProcessingThread, SIGNAL(finishedProcessing()), this, SLOT(finishedProcessing()));
-
-    mProcessingThread->start();
+        mProcessingThread->start();
+    }
 }

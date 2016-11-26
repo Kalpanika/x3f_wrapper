@@ -22,6 +22,7 @@ public:
     CProcessingThread(const QStringList& inFiles,
                       const QDir& inCurrentDir);
 
+    void stopNow();
 
 protected:
     void run();
@@ -31,6 +32,7 @@ signals:
     void progress(int currIndex, int totalNumber);
     void error_message(QString errorTitle, QString errorBody);
     void finishedProcessing();
+    void canceledProcessing();
 
 private:
     QSettings *settings;
@@ -41,6 +43,8 @@ private:
     void convertX3FFile(const QUrl& fileName, const QStringList& inArgs);
     bool runX3FConversion(const QUrl& fileName, const QStringList& inArgs);
     bool runExifTool(const QUrl& fileName);
+
+    bool mRunning;
 };
 
 #endif // CPROCESSINGTHREAD_H

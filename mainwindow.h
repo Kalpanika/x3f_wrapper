@@ -43,6 +43,7 @@ private slots:
     void updateProgress(int currIndex, int totalNumber);
     void finishedProcessing();
     void error_message(QString errorTitle, QString errorBody);
+    void canceledProcessing();
 
 private:
 
@@ -67,6 +68,7 @@ private:
 
     QString currentDir;
     QSettings *settings;
+    bool mRunning;  // set to true when the thread is running
 };
 
 #endif // MAINWINDOW_H

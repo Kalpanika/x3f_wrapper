@@ -12,6 +12,7 @@ CProcessingThread::CProcessingThread(const QStringList& inFiles,
     settings = new QSettings;
     files = inFiles;
     currentDir = inCurrentDir;
+    mRunning = true;
 }
 
 QStringList CProcessingThread::buildArgList(){
@@ -141,9 +142,13 @@ bool CProcessingThread::runExifTool(const QUrl& fileName){
 }
 
 void CProcessingThread::convertX3FFile(const QUrl& fileName, const QStringList& inArgs){
-    if (runX3FConversion(fileName, inArgs)){
+    if (runX3FConversion(fileName, inArgs) && mRunning){
         runExifTool(fileName);
     }
+}
+
+void CProcessingThread::stopNow(){
+    mRunning = false;
 }
 
 void CProcessingThread::run()
@@ -151,14 +156,19 @@ void CProcessingThread::run()
     QStringList arguments = buildArgList();
     try{
         for (int i = 0; i < files.size(); ++i) {
-            convertX3FFile(QUrl::fromLocalFile(currentDir.absoluteFilePath(files[i])),
-                           arguments);
-            emit progress(i, files.size());
+            if (mRunning){
+                convertX3FFile(QUrl::fromLocalFile(currentDir.absoluteFilePath(files[i])),
+                               arguments);
+                emit progress(i, files.size());
+            }
         }
     } catch(...){
         //something broke, but for now, do nothing.
     }
-
-    emit finishedProcessing();
+    if (mRunning){
+        emit finishedProcessing();
+    } else {
+        emit canceledProcessing();
+    }
     //sleep(1);  //to make sure the final signal is emitted before the thread is killed
 }
