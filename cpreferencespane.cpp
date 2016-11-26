@@ -97,6 +97,9 @@ void CPreferencesPane::loadPreferences(){
 }
 
 void CPreferencesPane::savePreferences(){
+    if (!SettingsConstants::checkSettings()){
+        return;
+    }
     settings->setValue(SettingsConstants::denoise, denoise->isChecked());
     settings->setValue(SettingsConstants::compress, compress->isChecked());
     settings->setValue(SettingsConstants::ocl, ocl->isChecked());

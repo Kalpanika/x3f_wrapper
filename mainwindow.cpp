@@ -54,7 +54,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     mPreferencesPane = new CPreferencesPane();
     find();
-    if (!checkSettings()){
+    if (!SettingsConstants::checkSettings()){
         configureSettings();
     }
     mRunning = false;
@@ -175,34 +175,6 @@ void MainWindow::createFilesTable()
 
     connect(filesTable, &QTableWidget::cellActivated,
             this, &MainWindow::convertFile);
-}\
-
-bool MainWindow::checkSettings(){
-    // use this function to check to see if the settings are properly configured
-    QString programLocation = settings->value(SettingsConstants::x3fLocation).toString();
-    if (programLocation.length() < 1){
-        QMessageBox::critical(NULL, "Please set the location of the x3f extractor executable",
-                              "This program needs the x3f_extract program to be installed.  You can get it here: <a href=\"https://github.com/Kalpanika/x3f/releases\">https://github.com/Kalpanika/x3f/releases</a>");
-        return false;
-    }
-    QFileInfo info(programLocation);
-    if (!info.isExecutable()){
-        QMessageBox::critical(NULL, "The X3F extractor is not an executable.",
-                              "The file chosen to be the X3F extractor is not an executable, so this extraction will fail.");
-        return false;
-    }
-    programLocation = settings->value(SettingsConstants::exifToolsLocation).toString();
-    if (programLocation.length() < 1){
-        QMessageBox::critical(NULL, "Please set the location of the exiftools executable",
-                              "This program uses the exif tools executable to copy metadata to the final file.  If you don't have it installed, metadata is not copied.  You can get it here: <a href=\"http://www.sno.phy.queensu.ca/~phil/exiftool/\">http://www.sno.phy.queensu.ca/~phil/exiftool/</a>");
-        return true;  // so that we don't check the exif tool
-    }
-    QFileInfo info2(programLocation);
-    if (!info2.isExecutable()){
-        QMessageBox::critical(NULL, "The exif tool is not an executable.",
-                              "The file chosen to be the exif tool is not an executable, so metadata copying will be skipped.");
-    }
-    return true;
 }
 
 void MainWindow::convertFile(int row, int /* column */)
@@ -246,9 +218,9 @@ void MainWindow::error_message(QString errorTitle, QString errorBody){
 
 void MainWindow::convertAllFiles()
 {
-    if (!checkSettings()){
-        return;
-    }
+    //if (!checkSettings()){
+    //    return;
+    //}
     if (mRunning){
         mProcessingThread->stopNow();
         convertAllButton->setText("Canceling...");
