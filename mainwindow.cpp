@@ -214,10 +214,10 @@ void MainWindow::convertFile(int row, int /* column */)
 
 void MainWindow::updateProgress(int currIndex, int totalNumber){
     //this signal is received, but finishedProcessing is not...
+    find();
     filesConvertLabel->setText(QString::number(currIndex + 1) +
                                " file(s) converted of " +
                                QString::number(totalNumber));
-    find();
 }
 
 void MainWindow::finishedProcessing(){
