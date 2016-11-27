@@ -106,7 +106,7 @@ void CPreferencesPane::savePreferences(){
     settings->setValue(SettingsConstants::x3fLocation, extractLocation->text());
     settings->setValue(SettingsConstants::exifToolsLocation, exiftoolsLocation->text());
     settings->sync();
-    if (!SettingsConstants::checkSettings()){
+    if (!SettingsConstants::checkSettings(true)){
         return;
     }
 }

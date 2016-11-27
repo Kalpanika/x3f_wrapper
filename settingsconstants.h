@@ -30,7 +30,7 @@ public:
     static const QString x3fLocationDefault;
     static const QString exifToolsLocationDefault;
 
-    static bool checkSettings();
+    static bool checkSettings(const bool &performExifToolsChecks);
 };
 
 #endif // SETTINGSCONSTANTS_H

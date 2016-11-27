@@ -49,7 +49,7 @@ const QString SettingsConstants::x3fLocationDefault =
 const QString SettingsConstants::exifToolsLocationDefault = "";
 
 
-bool SettingsConstants::checkSettings(){
+bool SettingsConstants::checkSettings(const bool &performExifToolsChecks){
     QSettings *settings = new QSettings;
     // use this function to check to see if the settings are properly configured
     QString programLocation = settings->value(SettingsConstants::x3fLocation).toString();
@@ -65,15 +65,18 @@ bool SettingsConstants::checkSettings(){
         return false;
     }
     programLocation = settings->value(SettingsConstants::exifToolsLocation).toString();
-    if (programLocation.length() < 1){
-        QMessageBox::critical(NULL, "Please set the location of the exiftools executable",
-                              "This program uses the exif tools executable to copy metadata to the final file.  If you don't have it installed, metadata is not copied.  You can get it here: <a href=\"http://www.sno.phy.queensu.ca/~phil/exiftool/\">http://www.sno.phy.queensu.ca/~phil/exiftool/</a>");
-        return true;  // so that we don't check the exif tool
-    }
-    QFileInfo info2(programLocation);
-    if (!info2.isExecutable()){
-        QMessageBox::critical(NULL, "The exif tool is not an executable.",
-                              "The file chosen to be the exif tool is not an executable, so metadata copying will be skipped.");
+    if (performExifToolsChecks){
+        if (programLocation.length() < 1){
+            QMessageBox::critical(NULL, "Please set the location of the exiftools executable",
+                                  "This program uses the exif tools executable to copy metadata to the final file.  If you don't have it installed, metadata is not copied.  You can get it here: <a href=\"http://www.sno.phy.queensu.ca/~phil/exiftool/\">http://www.sno.phy.queensu.ca/~phil/exiftool/</a>");
+            return true;
+        }
+        QFileInfo info2(programLocation);
+        if (!info2.isExecutable()){
+            QMessageBox::critical(NULL, "The exif tool is not an executable.",
+                                  "The file chosen to be the exif tool is not an executable, so metadata copying will be skipped.");
+            return true;
+        }
     }
 #ifdef Q_OS_WIN
     if (programLocation.contains("(-k)")){

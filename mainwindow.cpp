@@ -54,7 +54,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     mPreferencesPane = new CPreferencesPane();
     find();
-    if (!SettingsConstants::checkSettings()){
+    if (!SettingsConstants::checkSettings(true)){
         configureSettings();
     }
     mRunning = false;
@@ -218,9 +218,9 @@ void MainWindow::error_message(QString errorTitle, QString errorBody){
 
 void MainWindow::convertAllFiles()
 {
-    //if (!checkSettings()){
-    //    return;
-    //}
+    if (!SettingsConstants::checkSettings(false)){
+        return;
+    }
     if (mRunning){
         mProcessingThread->stopNow();
         convertAllButton->setText("Canceling...");
