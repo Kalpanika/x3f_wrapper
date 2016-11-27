@@ -97,9 +97,6 @@ void CPreferencesPane::loadPreferences(){
 }
 
 void CPreferencesPane::savePreferences(){
-    if (!SettingsConstants::checkSettings()){
-        return;
-    }
     settings->setValue(SettingsConstants::denoise, denoise->isChecked());
     settings->setValue(SettingsConstants::compress, compress->isChecked());
     settings->setValue(SettingsConstants::ocl, ocl->isChecked());
@@ -109,6 +106,9 @@ void CPreferencesPane::savePreferences(){
     settings->setValue(SettingsConstants::x3fLocation, extractLocation->text());
     settings->setValue(SettingsConstants::exifToolsLocation, exiftoolsLocation->text());
     settings->sync();
+    if (!SettingsConstants::checkSettings()){
+        return;
+    }
 }
 
 void CPreferencesPane::resetPreferences(){

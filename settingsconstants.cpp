@@ -75,5 +75,12 @@ bool SettingsConstants::checkSettings(){
         QMessageBox::critical(NULL, "The exif tool is not an executable.",
                               "The file chosen to be the exif tool is not an executable, so metadata copying will be skipped.");
     }
+#ifdef Q_OS_WIN
+    if (programLocation.contains("(-k)")){
+        QMessageBox::critical(NULL, "The exif tools file name must be edited",
+                              "The Windows exiftools executable name needs to be changed to exiftools.exe (ie, remove the '(-k)').  If you do not, the conversion will fail.");
+        return false;  // so that we don't check the exif tool
+    }
+#endif
     return true;
 }
