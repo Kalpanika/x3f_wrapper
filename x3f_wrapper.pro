@@ -10,7 +10,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = x3f_wrapper
 TEMPLATE = app
-CONFIG += static
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -22,3 +21,4 @@ HEADERS  += mainwindow.h \
     cpreferencespane.h \
     cprocessingthread.h \
     settingsconstants.h
+

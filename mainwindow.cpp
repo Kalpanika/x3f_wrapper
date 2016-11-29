@@ -188,7 +188,7 @@ bool MainWindow::checkSettings(){
     QFileInfo info(programLocation);
     if (!info.isExecutable()){
         QMessageBox::critical(NULL, "The X3F extractor is not an executable.",
-                              "The file chosen to be the X3F extractor is not an executable, so this extraction will fail.");
+                              "The file chosen to be the X3F extractor is not an executable, so extraction will fail.");
         return false;
     }
     programLocation = settings->value(SettingsConstants::exifToolsLocation).toString();
@@ -207,7 +207,6 @@ bool MainWindow::checkSettings(){
 
 void MainWindow::convertFile(int row, int /* column */)
 {
-    changeUI(false);
     QTableWidgetItem *item = filesTable->item(row, 0);
 
     QStringList files;

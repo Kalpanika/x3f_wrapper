@@ -42,6 +42,21 @@ const bool SettingsConstants::oclDefault = false;
 const int SettingsConstants::outputColorDefault = 0;
 const int SettingsConstants::outputWBDefault = 0;
 const int SettingsConstants::outputFormatDefault = 0;
+#ifdef Q_OS_WIN32
 const QString SettingsConstants::x3fLocationDefault =
         QDir::currentPath() + "/x3f_extract.exe";  // only for windows!
 const QString SettingsConstants::exifToolsLocationDefault = "";
+#elif defined(Q_OS_DARWIN) || defined(Q_OS_DARWIN64) || defined(Q_OS_MAC) || defined(Q_OS_MAC64) || defined(Q_OS_MACX) || defined(Q_OS_OSX)
+const QString SettingsConstants::x3fLocationDefault =
+        QDir::currentPath() + "/x3f_extract";  // only for mac!
+const QString SettingsConstants::exifToolsLocationDefault = "/usr/local/bin/exiftools";
+#elif defined(Q_OS_LINUX)
+const QString SettingsConstants::x3fLocationDefault =
+        QDir::currentPath() + "\x3f_extract";  // maybe also for linux?
+const QString SettingsConstants::exifToolsLocationDefault = "/usr/local/bin/exiftools";  // not sure what's up here, ie, perl installation
+#else
+const QString SettingsConstants::x3fLocationDefault = "No known default";
+const QString SettingsConstants::exifToolsLocationDefault = "No known default";
+#endif
+
+
