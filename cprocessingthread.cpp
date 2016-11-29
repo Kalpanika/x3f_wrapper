@@ -119,7 +119,7 @@ bool CProcessingThread::runExifTool(const QUrl& fileName){
         //immaterial for jpgs
         break;
     case 2:
-        exiftoolsargs << fileName.toLocalFile() + ".tiff";
+        exiftoolsargs << fileName.toLocalFile() + ".tif";
         exitCode = QProcess::execute(exiftools, exiftoolsargs);
         break;
     default:
