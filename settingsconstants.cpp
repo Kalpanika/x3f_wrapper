@@ -46,7 +46,8 @@ const int SettingsConstants::outputWBDefault = 0;
 const int SettingsConstants::outputFormatDefault = 0;
 const QString SettingsConstants::x3fLocationDefault =
         QDir::currentPath() + "/x3f_extract.exe";  // only for windows!
-const QString SettingsConstants::exifToolsLocationDefault = "";
+const QString SettingsConstants::exifToolsLocationDefault =
+        QDir::currentPath() + "/exiftool.exe";  // only for windows!
 
 
 bool SettingsConstants::checkSettings(const bool &performExifToolsChecks){

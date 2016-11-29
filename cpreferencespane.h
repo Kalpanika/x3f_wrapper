@@ -33,6 +33,7 @@ private:
     QLabel *colorLabel;
     QLabel *whiteBalanceLabel;
     QLabel *formatLabel;
+    QLabel *versionLabel;
     QCheckBox *denoise;
     QCheckBox *compress;
     QCheckBox *ocl;
