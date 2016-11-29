@@ -6,10 +6,10 @@ This project offers the ability to quickly convert a directory filled with X3F i
 
 To set it up:
 
-1) Download the binary file.  (Only windows at this point, Mac and Linux coming soon).
-2) Download the exif tools executable ([http://www.sno.phy.queensu.ca/~phil/exiftool/]http://www.sno.phy.queensu.ca/~phil/exiftool/)
-3) When you first open the app, you will be prompted to provide X3F Extract tools location, as well as the exif tools location.  The default binary release contains the 64 bit windows release, but you will need to set the location you downloaded in step 2.
-4) Set up the other parameters (denoising, file output type, etc).
+1. Download the binary file.  (Only windows at this point, Mac and Linux coming soon).
+2. Set up parameters (denoising, file output type, etc) in the preferences dialog, if you want something other than the defaults (denoised linear DNG).
+
+As of version 0.56.2, both the x3f_extract.exe and exiftools.exe programs are installed in the release binary, and the default settings point to the distributed executables.  If you want different versions of those executables, you can select them in the preferences dialog.
 
 To run it:
 Either double click on individual files, or convert all unprocessed images via the button in the bottom right.
