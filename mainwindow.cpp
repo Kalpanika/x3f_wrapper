@@ -54,7 +54,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     mPreferencesPane = new CPreferencesPane();
     find();
-    if (!checkSettings()){
+    if (!SettingsConstants::checkSettings(true)){
         configureSettings();
     }
     mRunning = false;
@@ -175,7 +175,7 @@ void MainWindow::createFilesTable()
 
     connect(filesTable, &QTableWidget::cellActivated,
             this, &MainWindow::convertFile);
-}\
+}
 
 bool MainWindow::checkSettings(){
     // use this function to check to see if the settings are properly configured
@@ -245,7 +245,7 @@ void MainWindow::error_message(QString errorTitle, QString errorBody){
 
 void MainWindow::convertAllFiles()
 {
-    if (!checkSettings()){
+    if (!SettingsConstants::checkSettings(false)){
         return;
     }
     if (mRunning){

@@ -51,6 +51,10 @@ CPreferencesPane::CPreferencesPane(QDialog *parent) : QDialog(parent)
     connect(browseEXIFButton, &QAbstractButton::clicked,
             this, &CPreferencesPane::browseEXIF);
 
+    versionLabel = new QLabel("v. 0.56.2"); // !!! MAKE SURE TO UPDATE THIS
+    //WITH EVERY NEW VERSION!!!
+
+
     settings = new QSettings();
     loadPreferences();
 
@@ -71,6 +75,7 @@ CPreferencesPane::CPreferencesPane(QDialog *parent) : QDialog(parent)
     preferencesLayout->addWidget(exiftoolsLocationLabel, row, 0);
     preferencesLayout->addWidget(exiftoolsLocation, row, 1, 1, 2);
     preferencesLayout->addWidget(browseEXIFButton, row++, 3);
+    preferencesLayout->addWidget(versionLabel, row, 0);
     preferencesLayout->addWidget(saveButton, row, 1);
     preferencesLayout->addWidget(resetButton, row, 2);
     preferencesLayout->addWidget(closeButton, row++, 3);
@@ -106,6 +111,9 @@ void CPreferencesPane::savePreferences(){
     settings->setValue(SettingsConstants::x3fLocation, extractLocation->text());
     settings->setValue(SettingsConstants::exifToolsLocation, exiftoolsLocation->text());
     settings->sync();
+    if (!SettingsConstants::checkSettings(true)){
+        return;
+    }
 }
 
 void CPreferencesPane::resetPreferences(){

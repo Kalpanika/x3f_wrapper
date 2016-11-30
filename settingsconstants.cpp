@@ -1,5 +1,7 @@
 #include "settingsconstants.h"
 #include <QDir>
+#include <QMessageBox>
+#include <QSettings>
 
 const QString SettingsConstants::lastDir = "lastDir";
 const QString SettingsConstants::compress = "compress";
@@ -45,6 +47,7 @@ const int SettingsConstants::outputFormatDefault = 0;
 #ifdef Q_OS_WIN32
 const QString SettingsConstants::x3fLocationDefault =
         QDir::currentPath() + "/x3f_extract.exe";  // only for windows!
+<<<<<<< HEAD
 const QString SettingsConstants::exifToolsLocationDefault = "";
 #elif defined(Q_OS_DARWIN) || defined(Q_OS_DARWIN64) || defined(Q_OS_MAC) || defined(Q_OS_MAC64) || defined(Q_OS_MACX) || defined(Q_OS_OSX)
 const QString SettingsConstants::x3fLocationDefault =
@@ -60,3 +63,47 @@ const QString SettingsConstants::exifToolsLocationDefault = "No known default";
 #endif
 
 
+=======
+const QString SettingsConstants::exifToolsLocationDefault =
+        QDir::currentPath() + "/exiftool.exe";  // only for windows!
+
+
+bool SettingsConstants::checkSettings(const bool &performExifToolsChecks){
+    QSettings *settings = new QSettings;
+    // use this function to check to see if the settings are properly configured
+    QString programLocation = settings->value(SettingsConstants::x3fLocation).toString();
+    if (programLocation.length() < 1){
+        QMessageBox::critical(NULL, "Please set the location of the x3f extractor executable",
+                              "This program needs the x3f_extract program to be installed.  You can get it here: <a href=\"https://github.com/Kalpanika/x3f/releases\">https://github.com/Kalpanika/x3f/releases</a>");
+        return false;
+    }
+    QFileInfo info(programLocation);
+    if (!info.isExecutable()){
+        QMessageBox::critical(NULL, "The X3F extractor is not an executable.",
+                              "The file chosen to be the X3F extractor is not an executable, so this extraction will fail.");
+        return false;
+    }
+    programLocation = settings->value(SettingsConstants::exifToolsLocation).toString();
+    if (performExifToolsChecks){
+        if (programLocation.length() < 1){
+            QMessageBox::critical(NULL, "Please set the location of the exiftools executable",
+                                  "This program uses the exif tools executable to copy metadata to the final file.  If you don't have it installed, metadata is not copied.  You can get it here: <a href=\"http://www.sno.phy.queensu.ca/~phil/exiftool/\">http://www.sno.phy.queensu.ca/~phil/exiftool/</a>");
+            return true;
+        }
+        QFileInfo info2(programLocation);
+        if (!info2.isExecutable()){
+            QMessageBox::critical(NULL, "The exif tool is not an executable.",
+                                  "The file chosen to be the exif tool is not an executable, so metadata copying will be skipped.");
+            return true;
+        }
+    }
+#ifdef Q_OS_WIN
+    if (programLocation.contains("(-k)")){
+        QMessageBox::critical(NULL, "The exif tools file name must be edited",
+                              "The Windows exiftools executable name needs to be changed to exiftools.exe (ie, remove the '(-k)').  If you do not, the conversion will fail.");
+        return false;  // so that we don't check the exif tool
+    }
+#endif
+    return true;
+}
+>>>>>>> e30048134c54c8d32f99fb1f4b5a8dae146ddfe1

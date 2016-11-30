@@ -29,6 +29,8 @@ public:
     static const int outputFormatDefault;
     static const QString x3fLocationDefault;
     static const QString exifToolsLocationDefault;
+
+    static bool checkSettings(const bool &performExifToolsChecks);
 };
 
 #endif // SETTINGSCONSTANTS_H
