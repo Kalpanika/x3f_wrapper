@@ -6,9 +6,16 @@
 
 int main(int argc, char *argv[])
 {
+    QApplication a(argc, argv);
+
     QCoreApplication::setOrganizationName("Kalpanika");
     QCoreApplication::setOrganizationDomain("kalpanika.com");
     QCoreApplication::setApplicationName("X3F Wrapper");
+
+#if defined(Q_OS_DARWIN) || defined(Q_OS_DARWIN64) || defined(Q_OS_MAC) || defined(Q_OS_MAC64) || defined(Q_OS_MACX) || defined(Q_OS_OSX)
+    SettingsConstants::x3fLocationDefault =
+            QCoreApplication::applicationDirPath() + "/x3f_extract";
+#endif  // the mac needs the path to be set here.  Perhaps other platforms need it as well...
 
     QSettings settings;
     int dirLen = settings.value(SettingsConstants::lastDir).toString().length();
@@ -33,7 +40,6 @@ int main(int argc, char *argv[])
         settings.sync();
     }
 
-    QApplication a(argc, argv);
     MainWindow w;
     w.show();
     return a.exec();

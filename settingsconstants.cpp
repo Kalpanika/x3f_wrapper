@@ -2,6 +2,7 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QSettings>
+#include <QCoreApplication>
 
 const QString SettingsConstants::lastDir = "lastDir";
 const QString SettingsConstants::compress = "compress";
@@ -44,15 +45,15 @@ const bool SettingsConstants::oclDefault = false;
 const int SettingsConstants::outputColorDefault = 0;
 const int SettingsConstants::outputWBDefault = 0;
 const int SettingsConstants::outputFormatDefault = 0;
+
 #ifdef Q_OS_WIN32
 const QString SettingsConstants::x3fLocationDefault =
         QDir::currentPath() + "/x3f_extract.exe";  // only for windows!
-<<<<<<< HEAD
-const QString SettingsConstants::exifToolsLocationDefault = "";
+const QString SettingsConstants::exifToolsLocationDefault =
+        QDir::currentPath() + "/exiftool.exe";  // only for windows!
 #elif defined(Q_OS_DARWIN) || defined(Q_OS_DARWIN64) || defined(Q_OS_MAC) || defined(Q_OS_MAC64) || defined(Q_OS_MACX) || defined(Q_OS_OSX)
-const QString SettingsConstants::x3fLocationDefault =
-        QDir::currentPath() + "/x3f_extract";  // only for mac!
-const QString SettingsConstants::exifToolsLocationDefault = "/usr/local/bin/exiftools";
+QString SettingsConstants::x3fLocationDefault = "/x3f_extract";  // can't be a static const because of the way mac loads things
+const QString SettingsConstants::exifToolsLocationDefault = "/usr/local/bin/exiftool";
 #elif defined(Q_OS_LINUX)
 const QString SettingsConstants::x3fLocationDefault =
         QDir::currentPath() + "\x3f_extract";  // maybe also for linux?
@@ -61,12 +62,6 @@ const QString SettingsConstants::exifToolsLocationDefault = "/usr/local/bin/exif
 const QString SettingsConstants::x3fLocationDefault = "No known default";
 const QString SettingsConstants::exifToolsLocationDefault = "No known default";
 #endif
-
-
-=======
-const QString SettingsConstants::exifToolsLocationDefault =
-        QDir::currentPath() + "/exiftool.exe";  // only for windows!
-
 
 bool SettingsConstants::checkSettings(const bool &performExifToolsChecks){
     QSettings *settings = new QSettings;
@@ -106,4 +101,3 @@ bool SettingsConstants::checkSettings(const bool &performExifToolsChecks){
 #endif
     return true;
 }
->>>>>>> e30048134c54c8d32f99fb1f4b5a8dae146ddfe1
