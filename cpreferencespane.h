@@ -26,6 +26,9 @@ private slots:
     void resetPreferences();
     void browseX3F();
     void browseEXIF();
+    void browseDNGOpcode();
+    void format_changed();
+    void flatfield_changed();
 
 private:
     void loadPreferences();
@@ -48,6 +51,10 @@ private:
     QLineEdit *exiftoolsLocation;
     QPushButton *browseX3FButton;
     QPushButton *browseEXIFButton;
+    QCheckBox *flatfield;
+    QLabel *dngOpcodeLocationLabel;
+    QLineEdit *dngOpcodeLocation;
+    QPushButton *browseDNGOpcodeButton;
     QPushButton *closeButton;
 
     QSettings *settings;

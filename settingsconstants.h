@@ -15,6 +15,8 @@ public:
     static const QString outputFormat;      //type = int
     static const QString x3fLocation;       //type = string
     static const QString exifToolsLocation; //type = string
+    static const QString flatfield;         //type = bool
+    static const QString dngOpcodeLocation; //type = string
 
     static const QStringList wbOptions;
     static const QStringList colorOptions;
@@ -29,10 +31,14 @@ public:
     static const int outputFormatDefault;
 #if defined(Q_OS_DARWIN) || defined(Q_OS_DARWIN64) || defined(Q_OS_MAC) || defined(Q_OS_MAC64) || defined(Q_OS_MACX) || defined(Q_OS_OSX)
     static QString x3fLocationDefault;  // can't make it a constant on mac because it won't be properly defined
+    static QString dngOpcodeLocationDefault;
+    static QString exifToolsLocationDefault;
 #else
     static const QString x3fLocationDefault;
-#endif
+    static const QString dngOpcodeLocationDefault;
     static const QString exifToolsLocationDefault;
+#endif
+    static const bool flatfieldDefault;
 
     static bool checkSettings(const bool &performExifToolsChecks);
 };

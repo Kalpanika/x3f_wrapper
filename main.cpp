@@ -14,7 +14,9 @@ int main(int argc, char *argv[])
 
 #if defined(Q_OS_DARWIN) || defined(Q_OS_DARWIN64) || defined(Q_OS_MAC) || defined(Q_OS_MAC64) || defined(Q_OS_MACX) || defined(Q_OS_OSX)
     SettingsConstants::x3fLocationDefault =
-            QCoreApplication::applicationDirPath() + "/x3f_extract";
+            QCoreApplication::applicationDirPath() + "/x3f_extract_mac";
+    SettingsConstants::dngOpcodeLocationDefault =
+            QCoreApplication::applicationDirPath() + "/opcodes";
 #endif  // the mac needs the path to be set here.  Perhaps other platforms need it as well...
 
     QSettings settings;
@@ -37,6 +39,8 @@ int main(int argc, char *argv[])
                           SettingsConstants::x3fLocationDefault);
         settings.setValue(SettingsConstants::exifToolsLocation,
                           SettingsConstants::exifToolsLocationDefault);
+        settings.setValue(SettingsConstants::dngOpcodeLocation,
+                          SettingsConstants::dngOpcodeLocationDefault);
         settings.sync();
     }
 

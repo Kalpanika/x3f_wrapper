@@ -42,7 +42,8 @@ private:
     QStringList buildArgList();
     void convertX3FFile(const QUrl& fileName, const QStringList& inArgs);
     bool runX3FConversion(const QUrl& fileName, const QStringList& inArgs);
-    bool runExifTool(const QUrl& fileName);
+    bool runExifTool(QString exiftool, const QUrl& fileName, const QString &ff_corr);
+    QString runExifTool_GetFFParam(const QString& exiftool, const QUrl& fileName, const bool& verbose);
 
     bool mRunning;
 };
