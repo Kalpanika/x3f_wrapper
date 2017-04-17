@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 
 #if defined(Q_OS_DARWIN) || defined(Q_OS_DARWIN64) || defined(Q_OS_MAC) || defined(Q_OS_MAC64) || defined(Q_OS_MACX) || defined(Q_OS_OSX)
     SettingsConstants::x3fLocationDefault =
-            QCoreApplication::applicationDirPath() + "/x3f_extract_mac";
+            QCoreApplication::applicationDirPath() + "/x3f_extract";  // called _mac in the project, but without the _mac for deploy
     SettingsConstants::dngOpcodeLocationDefault =
             QCoreApplication::applicationDirPath() + "/opcodes";
 #endif  // the mac needs the path to be set here.  Perhaps other platforms need it as well...
