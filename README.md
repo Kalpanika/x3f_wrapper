@@ -15,3 +15,16 @@ To run it:
 Either double click on individual files, or convert all unprocessed images via the button in the bottom right.
 
 Please let us know if you have any issues with the conversion!
+
+For Mac Developers:
+
+To create a dmg for installation:
+
+1. copy `x3f_extract_mac` into the `x3f_wrapper.app/Contents/MacOS` directory
+2. copy the `opcodes` folder into the `x3f_wrapper.app/Contents/MacOS` directory
+3. rename the `x3f_extract_mac` program in the `x3f_wrapper.app/Contents/MacOS` directory to `x3f_wrapper`
+4. run the following command from a directory where `x3f_wrapper.app` is visible:
+
+    <QTDIR>/bin/macdeployqt x3f_wrapper.app/ -dmg
+
+And you should now have an installable dmg file.
