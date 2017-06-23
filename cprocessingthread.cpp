@@ -182,20 +182,20 @@ QString CProcessingThread::runExifTool_GetFFParam(const QString& exiftools,
     QString aperture;
     int index;
     if (( index = exiftool_output.indexOf("Aperture                        : ")) < 0) {
-        emit error_message("Warning","No aperture EXIF data found!");
+        emit error_message("Warning", "No aperture EXIF data found!");
         return output_string;
     }
     index += 34;  //34 seems like a bit of a magic number; could the string instead be split?
-    while (exiftool_output.at(index) != '\n')
+    while ((exiftool_output.at(index) != '\n') && (exiftool_output.at(index) != '\r')) //windows line endings too...
         aperture += exiftool_output.at(index++);
 
     QString lens_id;
     if (( index = exiftool_output.indexOf("Lens ID                         : ")) < 0) {
-        emit error_message("Warning","No lens ID EXIF data found!");
+        emit error_message("Warning", "No lens ID EXIF data found!");
         return output_string;
     }
     index += 34;
-    while (exiftool_output.at(index) != '\n')
+    while ((exiftool_output.at(index) != '\n') && (exiftool_output.at(index) != '\r'))
         lens_id += exiftool_output.at(index++);
     lens_id.replace(' ','_');
     lens_id.replace('|','_');  // for Sigma Art Lenses, there sometimes is an '|' in the name --> invalid in a file name on most OSs
