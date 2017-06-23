@@ -64,7 +64,7 @@ CPreferencesPane::CPreferencesPane(QDialog *parent) : QDialog(parent)
     connect(flatfield, &QCheckBox::stateChanged, this, &CPreferencesPane::flatfield_changed);
     connect(formatComboBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &CPreferencesPane::format_changed);
 
-    versionLabel = new QLabel("v. 0.56.3 Beta"); // 1st version of Merrill flat-fielding
+    versionLabel = new QLabel("v. 0.57 Beta"); // 1st version of Merrill flat-fielding
     // MAKE SURE TO UPDATE THIS WITH EVERY NEW VERSION!!!
 
 
